@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1083409989183",
+    "project_id": "smart-note-75b48",
+    "storage_bucket": "smart-note-75b48.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1083409989183:android:3733cd399e76655adbc28a",
+        "android_client_info": {
+          "package_name": "yassine.app.smart_note"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCY_7Hj7O64ihcwr0q_zjOXU5Unf3Fj3tU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

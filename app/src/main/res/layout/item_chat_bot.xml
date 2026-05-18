@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingVertical="8dp"
+    android:paddingHorizontal="12dp">
+
+    <!-- Avatar AI -->
+    <ImageView
+        android:id="@+id/iv_avatar"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:src="@drawable/ic_ai_avatar"
+        android:contentDescription="AI Avatar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <!-- Conteneur du message -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cv_message_container"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="48dp"
+        app:cardBackgroundColor="#F0F0F0"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="1dp"
+        app:layout_constrainedWidth="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/iv_avatar"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/tv_time">
+
+        <TextView
+            android:id="@+id/tv_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:textColor="#212121"
+            android:textSize="14sp"
+            android:lineSpacingExtra="4dp"
+            android:textIsSelectable="true" />
+
+    </androidx.cardview.widget.CardView>
+
+    <!-- Heure -->
+    <TextView
+        android:id="@+id/tv_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginStart="4dp"
+        android:textColor="#888888"
+        android:textSize="10sp"
+        app:layout_constraintStart_toStartOf="@id/cv_message_container"
+        app:layout_constraintTop_toBottomOf="@id/cv_message_container" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Smart Note</string>
+    <!-- Replace this with your real Web Client ID from Firebase Console later -->
+    <string name="default_web_client_id">your_web_client_id_here</string>
+</resources>
