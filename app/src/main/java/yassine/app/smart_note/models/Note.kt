@@ -1,16 +1,23 @@
 package yassine.app.smart_note.models
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.json.JsonNames
 
-@Serializable
+
 data class Note(
     val id: String = "",
+    @SerialName("user_id")
     val userId: String = "",
     val title: String = "",
     val content: String = "",
     val color: String = "#FFFFFF",
+    @SerialName("is_favorite")
     val isFavorite: Boolean = false,
+    @SerialName("created_at")
     val createdAt: Long = System.currentTimeMillis(),
+    @SerialName("updated_at")
     val updatedAt: Long = System.currentTimeMillis()
 ) {
     fun toEntity(): NoteEntity = NoteEntity(

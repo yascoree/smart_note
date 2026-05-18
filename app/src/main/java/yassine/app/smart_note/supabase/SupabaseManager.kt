@@ -9,7 +9,7 @@ import yassine.app.smart_note.utils.Constants
 
 object SupabaseManager {
 
-    private var client: SupaqueClient? = null
+    private var client: SupabaseClient? = null
 
     fun getInstance(): SupabaseClient {
         if (client == null) {
@@ -20,7 +20,6 @@ object SupabaseManager {
                 install(Postgrest)
                 install(Auth)
                 install(Realtime)
-                // Le client HTTP par défaut est automatiquement configuré
             }
         }
         return client!!

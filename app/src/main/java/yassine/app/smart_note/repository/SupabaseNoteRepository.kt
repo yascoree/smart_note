@@ -1,6 +1,5 @@
 package yassine.app.smart_note.repository
 
-import android.R.attr.order
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +18,7 @@ class SupabaseNoteRepository {
     suspend fun getAllNotes(): List<Note> = withContext(Dispatchers.IO) {
         try {
             val response = notesTable.select {
-                order(column = "updated_at", order = Order.DESCENDING)
+                order("updated_at", Order.DESCENDING)
             }
             response.decodeList<Note>()
         } catch (e: Exception) {
@@ -33,7 +32,7 @@ class SupabaseNoteRepository {
         try {
             val response = notesTable.select {
                 filter { eq("is_favorite", true) }
-                order(column = "updated_at", order = Order.DESCENDING)
+                order("updated_at", Order.DESCENDING)
             }
             response.decodeList<Note>()
         } catch (e: Exception) {
@@ -52,7 +51,7 @@ class SupabaseNoteRepository {
                         ilike("content", "%$query%")
                     }
                 }
-                order(column = "updated_at", order = Order.DESCENDING)
+                order("updated_at", Order.DESCENDING)
             }
             response.decodeList<Note>()
         } catch (e: Exception) {
@@ -67,8 +66,7 @@ class SupabaseNoteRepository {
             val response = notesTable.insert(note) {
                 select()
             }
-            val notes = response.decodeList<Note>()
-            notes.firstOrNull()
+            response.decodeList<Note>().firstOrNull()
         } catch (e: Exception) {
             e.printStackTrace()
             null

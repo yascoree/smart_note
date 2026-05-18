@@ -7,7 +7,14 @@ import yassine.app.smart_note.models.User
 
 class FirebaseAuthRepository(private val authService: FirebaseAuthService) {
 
-    val authState: Flow<AuthState> = authService.authState
+    val authState: Flow<AuthState> = authService.authState.map { state ->
+        when (state) {
+            is yassine.app.smart_note.firebase.AuthState.Unauthenticated -> AuthState.Unauthenticated
+            is yassine.app.smart_note.firebase.AuthState.Loading -> AuthState.Loading
+            is yassine.app.smart_note.firebase.AuthState.Authenticated -> AuthState.Authenticated(state.user)
+            is yassine.app.smart_note.firebase.AuthState.Error -> AuthState.Error(state.message)
+        }
+    }
 
     suspend fun login(email: String, password: String): Result<User> {
         return authService.signInWithEmail(email, password)
