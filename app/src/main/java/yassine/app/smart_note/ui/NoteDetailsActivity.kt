@@ -76,13 +76,23 @@ class NoteDetailsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                isFavorite = repository.toggleFavorite(noteId)
-                updateFavoriteIcon()
-                Toast.makeText(
-                    this@NoteDetailsActivity,
-                    if (isFavorite) "Added to favorites" else "Removed from favorites",
-                    Toast.LENGTH_SHORT
-                ).show()
+                try {
+                    val newStatus = !isFavorite
+                    val updated = repository.toggleFavorite(noteId, newStatus)
+                    if (updated) {
+                        isFavorite = newStatus
+                        updateFavoriteIcon()
+                        Toast.makeText(
+                            this@NoteDetailsActivity,
+                            if (isFavorite) "Added to favorites" else "Removed from favorites",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        Toast.makeText(this@NoteDetailsActivity, "Erreur lors de la mise à jour", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this@NoteDetailsActivity, e.message ?: "Erreur lors de la mise à jour", Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
@@ -92,12 +102,16 @@ class NoteDetailsActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
             lifecycleScope.launch {
-                val deleted = repository.deleteNote(noteId)
-                if (deleted) {
-                    Toast.makeText(this@NoteDetailsActivity, "Note supprimée", Toast.LENGTH_SHORT).show()
-                    finish()
-                } else {
-                    Toast.makeText(this@NoteDetailsActivity, "Erreur lors de la suppression", Toast.LENGTH_SHORT).show()
+                try {
+                    val deleted = repository.deleteNote(noteId)
+                    if (deleted) {
+                        Toast.makeText(this@NoteDetailsActivity, "Note supprimée", Toast.LENGTH_SHORT).show()
+                        finish()
+                    } else {
+                        Toast.makeText(this@NoteDetailsActivity, "Erreur lors de la suppression", Toast.LENGTH_SHORT).show()
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this@NoteDetailsActivity, e.message ?: "Erreur lors de la suppression", Toast.LENGTH_SHORT).show()
                 }
             }
         }

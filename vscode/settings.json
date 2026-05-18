@@ -1,0 +1,17 @@
+{
+    // Désactiver Java/Gradle
+    "java.import.gradle.enabled": false,
+    "java.configuration.updateBuildConfiguration": "disabled",
+    "java.autobuild.enabled": false,
+    "java.compile.nullAnalysis.mode": "disabled",
+    
+    // Kotlin (optionnel, pour la coloration syntaxique)
+    "kotlin.languageServer.enabled": false,
+    
+    // Python (si backend)
+    "python.defaultInterpreterPath": "${workspaceFolder}/backend_smart_note/venv/bin/python",
+    
+    // Éditeur
+    "editor.formatOnSave": true,
+    "files.autoSave": "onFocusChange"
+}

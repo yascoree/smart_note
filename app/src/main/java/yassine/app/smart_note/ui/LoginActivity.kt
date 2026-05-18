@@ -31,7 +31,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private val googleLauncher = registerForActivityResult(
-        com.google.android.gms.common.api.ApiException::class.java,
         androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == RESULT_OK) {

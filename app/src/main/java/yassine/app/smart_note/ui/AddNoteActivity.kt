@@ -105,6 +105,7 @@ class AddNoteActivity : AppCompatActivity() {
                     binding.btnSave.isEnabled = true
                     Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
                 }
+
             }
         }
     }

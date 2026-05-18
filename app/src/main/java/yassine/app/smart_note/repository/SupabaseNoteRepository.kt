@@ -15,109 +15,89 @@ class SupabaseNoteRepository {
     private val notesTable = supabase.postgrest["notes"]
 
     // Récupérer toutes les notes
-    suspend fun getAllNotes(): List<Note> = withContext(Dispatchers.IO) {
-        try {
-            val response = notesTable.select {
-                order("updated_at", Order.DESCENDING)
-            }
-            response.decodeList<Note>()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+    suspend fun getAllNotes(userId: String): List<Note> = withContext(Dispatchers.IO) {
+        val response = notesTable.select {
+            filter { eq("user_id", userId) }
+            order("updated_at", Order.DESCENDING)
         }
+        response.decodeList<Note>()
     }
 
     // Récupérer les favoris
-    suspend fun getFavoriteNotes(): List<Note> = withContext(Dispatchers.IO) {
-        try {
-            val response = notesTable.select {
-                filter { eq("is_favorite", true) }
-                order("updated_at", Order.DESCENDING)
+    suspend fun getFavoriteNotes(userId: String): List<Note> = withContext(Dispatchers.IO) {
+        val response = notesTable.select {
+            filter {
+                eq("user_id", userId)
+                eq("is_favorite", true)
             }
-            response.decodeList<Note>()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+            order("updated_at", Order.DESCENDING)
         }
+        response.decodeList<Note>()
     }
 
     // Rechercher des notes
-    suspend fun searchNotes(query: String): List<Note> = withContext(Dispatchers.IO) {
-        try {
-            val response = notesTable.select {
-                filter {
-                    or {
-                        ilike("title", "%$query%")
-                        ilike("content", "%$query%")
-                    }
+    suspend fun searchNotes(userId: String, query: String): List<Note> = withContext(Dispatchers.IO) {
+        val response = notesTable.select {
+            filter {
+                eq("user_id", userId)
+                or {
+                    ilike("title", "%$query%")
+                    ilike("content", "%$query%")
                 }
-                order("updated_at", Order.DESCENDING)
             }
-            response.decodeList<Note>()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
+            order("updated_at", Order.DESCENDING)
         }
+        response.decodeList<Note>()
     }
 
     // Ajouter une note
-    suspend fun addNote(note: Note): Note? = withContext(Dispatchers.IO) {
-        try {
-            val response = notesTable.insert(note) {
-                select()
-            }
-            response.decodeList<Note>().firstOrNull()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
+    suspend fun addNote(note: Note): Note = withContext(Dispatchers.IO) {
+        val response = notesTable.insert(note) {
+            select()
         }
+        response.decodeList<Note>().first()
     }
 
     // Mettre à jour une note
-    suspend fun updateNote(noteId: String, updates: Map<String, Any>): Boolean = withContext(Dispatchers.IO) {
-        try {
-            notesTable.update(updates) {
-                filter { eq("id", noteId) }
+    suspend fun updateNote(userId: String, noteId: String, updates: Map<String, Any>): Note = withContext(Dispatchers.IO) {
+        val response = notesTable.update(updates) {
+            select()
+            filter {
+                eq("id", noteId)
+                eq("user_id", userId)
             }
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
         }
+        response.decodeList<Note>().first()
     }
 
     // Supprimer une note
-    suspend fun deleteNote(noteId: String): Boolean = withContext(Dispatchers.IO) {
-        try {
-            notesTable.delete {
-                filter { eq("id", noteId) }
+    suspend fun deleteNote(userId: String, noteId: String): Boolean = withContext(Dispatchers.IO) {
+        notesTable.delete {
+            filter {
+                eq("id", noteId)
+                eq("user_id", userId)
             }
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
         }
+        true
     }
 
     // Changer le statut favori
-    suspend fun toggleFavorite(noteId: String, isFavorite: Boolean): Boolean = withContext(Dispatchers.IO) {
-        try {
-            notesTable.update(
-                mapOf("is_favorite" to isFavorite)
-            ) {
-                filter { eq("id", noteId) }
+    suspend fun toggleFavorite(userId: String, noteId: String, isFavorite: Boolean): Boolean = withContext(Dispatchers.IO) {
+        notesTable.update(
+            mapOf("is_favorite" to isFavorite)
+        ) {
+            filter {
+                eq("id", noteId)
+                eq("user_id", userId)
             }
-            true
-        } catch (e: Exception) {
-            e.printStackTrace()
-            false
         }
+        true
     }
 
     // Flow pour les changements en temps réel
-    fun observeNotes(): Flow<List<Note>> = flow {
+    fun observeNotes(userId: String): Flow<List<Note>> = flow {
         while (true) {
-            emit(getAllNotes())
+            emit(getAllNotes(userId))
             kotlinx.coroutines.delay(2000) // Polling toutes les 2 secondes
         }
     }

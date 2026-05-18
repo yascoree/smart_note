@@ -1,10 +1,9 @@
 package yassine.app.smart_note.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import yassine.app.smart_note.models.User
 import yassine.app.smart_note.repository.FirebaseAuthRepository
@@ -14,17 +13,17 @@ class AuthViewModel(
     private val authRepository: FirebaseAuthRepository
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow<Resource<User>>(Resource.Idle())
-    val loginState: StateFlow<Resource<User>> = _loginState.asStateFlow()
+    private val _loginState = MutableLiveData<Resource<User>>(Resource.Idle())
+    val loginState: LiveData<Resource<User>> = _loginState
 
-    private val _signupState = MutableStateFlow<Resource<User>>(Resource.Idle())
-    val signupState: StateFlow<Resource<User>> = _signupState.asStateFlow()
+    private val _signupState = MutableLiveData<Resource<User>>(Resource.Idle())
+    val signupState: LiveData<Resource<User>> = _signupState
 
-    private val _logoutState = MutableStateFlow<Resource<Boolean>>(Resource.Idle())
-    val logoutState: StateFlow<Resource<Boolean>> = _logoutState.asStateFlow()
+    private val _logoutState = MutableLiveData<Resource<Boolean>>(Resource.Idle())
+    val logoutState: LiveData<Resource<Boolean>> = _logoutState
 
-    private val _authState = MutableStateFlow<AuthUiState>(AuthUiState.Unauthenticated)
-    val authState: StateFlow<AuthUiState> = _authState.asStateFlow()
+    private val _authState = MutableLiveData<AuthUiState>(AuthUiState.Unauthenticated)
+    val authState: LiveData<AuthUiState> = _authState
 
     init {
         observeAuthState()

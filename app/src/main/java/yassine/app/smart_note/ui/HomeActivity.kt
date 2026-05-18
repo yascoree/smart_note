@@ -58,7 +58,7 @@ class HomeActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         noteAdapter = NoteAdapter(
             onItemClick = { note -> openNoteDetail(note) },
-            onFavoriteClick = { note -> viewModel.toggleFavorite(note.id) },
+            onFavoriteClick = { note -> viewModel.toggleFavorite(note.id, note.isFavorite) },
             onDeleteClick = { note -> viewModel.deleteNote(note.id) }
         )
 
