@@ -7,11 +7,15 @@
     <color name="border">#E8E8E8</color>
     <color name="border_strong">#D0D0D0</color>
 
+    <!-- Text -->
     <color name="text_primary">#1A1A1A</color>
-    <color name="text_secondary">#666666</color>
-    <color name="text_tertiary">#B0B0B0</color>
+    <color name="text_secondary">#8A8A8A</color>
+    <color name="text_tertiary">#C2C2C2</color>
     <color name="text_inverse">#FFFFFF</color>
 
+    <color name="accent_primary">#2196F3</color>
+    <color name="accent_purple">#9C27B0</color>
+    <color name="accent_purple_light">#9C27B0</color>
     <color name="accent_purple_bg">#EEEDFE</color>
     <color name="accent_teal">#0F6E56</color>
     <color name="accent_teal_bg">#E1F5EE</color>
@@ -27,36 +31,27 @@
     <color name="background_alt">#FAFAFA</color>
     <color name="outline">#E8E8E8</color>
 
+    <!-- Old dark theme (for backward compatibility if needed) -->
+    <color name="bg_deep">#1C1C28</color>
+    <color name="bg_surface">#242435</color>
+    <color name="bg_elevated">#2E2E42</color>
+    <color name="bg_tint_purple">#2D2458</color>
+    <color name="border_subtle">#3A3A52</color>
+    <color name="text_muted">#6E6C8A</color>
 
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-
-
-    <!-- Thème sombre -->
-    <color name="background_dark">#121212</color>
-    <color name="surface_dark">#1E1E1E</color>
-    <color name="border_dark">#333333</color>
-    <color name="text_primary_dark">#FFFFFF</color>
-    <color name="text_secondary_dark">#B0B0B0</color>
-    <color name="text_tertiary_dark">#666666</color>
-
-    <!-- Couleurs d'accent -->
-    <color name="accent_primary">#2196F3</color>
-    <color name="accent_purple">#9C27B0</color>
-    <color name="accent_green">#4CAF50</color>
-    <color name="accent_red">#F44336</color>
-    <color name="accent_orange">#FF9800</color>
-
-    <!-- Notes colorées -->
+    <!-- Note colors -->
     <color name="note_white">#FFFFFF</color>
     <color name="note_red">#FFCDD2</color>
     <color name="note_blue">#BBDEFB</color>
     <color name="note_green">#C8E6C9</color>
     <color name="note_yellow">#FFF9C4</color>
     <color name="note_purple">#E1BEE7</color>
+
+    <!-- Status -->
+    <color name="color_error">#FF6B6B</color>
+    <color name="color_success">#4ADE80</color>
+
+    <!-- Keep these for Material compatibility -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
 </resources>

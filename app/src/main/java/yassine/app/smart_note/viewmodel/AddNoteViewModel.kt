@@ -17,11 +17,11 @@ class AddNoteViewModel(private val repository: SmartNoteRepository) : ViewModel(
     private val _updateState = MutableLiveData<Resource<Note>>()
     val updateState: LiveData<Resource<Note>> = _updateState
 
-    fun saveNote(title: String, content: String, color: String) {
+    fun saveNote(title: String, content: String, noteType: String = "Personal") {
         _saveState.value = Resource.Loading
         viewModelScope.launch {
             try {
-                val note = repository.addNote(title, content, color)
+                val note = repository.addNote(title, content, noteType)
                 _saveState.value = Resource.Success(note)
             } catch (e: Exception) {
                 _saveState.value = Resource.Error(e.message ?: "Erreur lors de la sauvegarde")

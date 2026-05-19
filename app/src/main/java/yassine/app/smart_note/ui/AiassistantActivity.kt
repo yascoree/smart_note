@@ -1,23 +1,17 @@
 package yassine.app.smart_note.ui
 
-import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.os.Bundle
-import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
-import android.speech.SpeechRecognizer
-import android.view.MotionEvent
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 import yassine.app.smart_note.adapters.ChatAdapter
 import yassine.app.smart_note.databinding.ActivityAiassistantBinding
 import yassine.app.smart_note.models.ChatMessage
@@ -31,22 +25,38 @@ class AiAssistantActivity : AppCompatActivity() {
     private val messages = mutableListOf<ChatMessage>()
     private val repository by lazy { SmartNoteRepository.getInstance(applicationContext) }
 
-    private var speechRecognizer: SpeechRecognizer? = null
-    private var recognitionIntent: Intent? = null
-    private var isRecording = false
-    private val RECORD_AUDIO_REQUEST = 101
-    private var originalMicTint: ColorStateList? = null
+    private var noteContent: String? = null
+    private var noteTitle: String? = null
+
+    private val speechRecognitionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != RESULT_OK) return@registerForActivityResult
+
+        val recognizedText = result.data
+            ?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+            ?.firstOrNull()
+
+        if (!recognizedText.isNullOrBlank()) {
+            binding.etMessage.setText(recognizedText)
+            binding.etMessage.setSelection(binding.etMessage.text.length)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAiassistantBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        noteContent = intent.getStringExtra("note_content")
+        noteTitle = intent.getStringExtra("note_title")
+
         setupRecyclerView()
         setupClickListeners()
 
         addWelcomeMessage()
         syncNotesWithBackend()
+        handleIncomingNoteContext()
     }
 
     private fun setupRecyclerView() {
@@ -65,26 +75,8 @@ class AiAssistantActivity : AppCompatActivity() {
             }
         }
 
-        // Hold-to-record behavior
-        originalMicTint = binding.btnMic.backgroundTintList
-        binding.btnMic.setOnTouchListener { v, event ->
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> {
-                    if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.RECORD_AUDIO), RECORD_AUDIO_REQUEST)
-                    } else {
-                        binding.btnMic.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, yassine.app.smart_note.R.color.accent_purple))
-                        startRecording()
-                    }
-                    true
-                }
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    stopRecording()
-                    binding.btnMic.backgroundTintList = originalMicTint
-                    true
-                }
-                else -> false
-            }
+        binding.btnMic.setOnClickListener {
+            startVoiceInput()
         }
 
         // Quick action chips
@@ -114,86 +106,29 @@ class AiAssistantActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == RECORD_AUDIO_REQUEST) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startRecording()
-            } else {
-                Toast.makeText(this, "Permission audio requise pour enregistrer", Toast.LENGTH_SHORT).show()
-            }
+    private fun startVoiceInput() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Parle pour dicter ton message")
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
         }
-    }
 
-    private fun startRecording() {
-        if (SpeechRecognizer.isRecognitionAvailable(this)) {
-            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this)
-            recognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
-                putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-                putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-            }
-
-            speechRecognizer?.setRecognitionListener(object : RecognitionListener {
-                override fun onReadyForSpeech(params: Bundle?) {}
-                override fun onBeginningOfSpeech() {}
-                override fun onRmsChanged(rmsdB: Float) {}
-                override fun onBufferReceived(buffer: ByteArray?) {}
-                override fun onEndOfSpeech() {}
-                override fun onError(error: Int) {
-                    stopRecording()
-                    Toast.makeText(this@AiAssistantActivity, "Couldn't hear that, try again", Toast.LENGTH_SHORT).show()
-                }
-
-                override fun onResults(results: Bundle) {
-                    val matches = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                    if (!matches.isNullOrEmpty()) {
-                        val text = matches[0]
-                        binding.etMessage.setText(text)
-                        sendMessage(text)
-                    } else {
-                        Toast.makeText(this@AiAssistantActivity, "Couldn't hear that, try again", Toast.LENGTH_SHORT).show()
-                    }
-                    stopRecording()
-                }
-
-                override fun onPartialResults(partialResults: Bundle) {
-                    val matches = partialResults.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                    if (!matches.isNullOrEmpty()) {
-                        binding.etMessage.setText(matches[0])
-                    }
-                }
-
-                override fun onEvent(eventType: Int, params: Bundle?) {}
-            })
-
-            speechRecognizer?.startListening(recognitionIntent)
-            isRecording = true
-            try {
-                binding.btnMic.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(this, yassine.app.smart_note.R.color.accent_purple))
-            } catch (e: Exception) {
-                binding.btnMic.alpha = 0.9f
-            }
-        } else {
-            Toast.makeText(this, "Reconnaissance vocale non disponible", Toast.LENGTH_SHORT).show()
+        val canHandleSpeech = intent.resolveActivity(packageManager)
+        if (canHandleSpeech == null) {
+            Toast.makeText(
+                this,
+                "Aucune app de dictée n'est installée. Installe Google Speech Services ou utilise le clavier.",
+                Toast.LENGTH_LONG
+            ).show()
+            return
         }
-    }
 
-    private fun stopRecording() {
-        speechRecognizer?.stopListening()
-        speechRecognizer?.cancel()
-        speechRecognizer?.destroy()
-        speechRecognizer = null
-        isRecording = false
-        try {
-            binding.btnMic.backgroundTintList = originalMicTint
-        } catch (e: Exception) {
-            binding.btnMic.alpha = 1.0f
-        }
+        speechRecognitionLauncher.launch(intent)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopRecording()
     }
 
     private fun addWelcomeMessage() {
@@ -252,5 +187,26 @@ class AiAssistantActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    private fun handleIncomingNoteContext() {
+        if (!noteContent.isNullOrBlank()) {
+
+            val prompt = """
+                Aide-moi avec cette note :
+                
+                Titre: ${noteTitle ?: "Sans titre"}
+                
+                Contenu:
+                $noteContent
+                
+                Donne :
+                - résumé
+                - amélioration
+                - idées
+                """.trimIndent()
+
+            sendMessage(prompt)
+        }
     }
 }

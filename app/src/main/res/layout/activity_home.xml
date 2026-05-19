@@ -80,75 +80,108 @@
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_all"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:text="All"
                     android:textSize="12sp"
                     android:layout_marginEnd="8dp"
-                    app:chipBackgroundColor="@color/accent_purple_bg"
-                    app:chipStrokeColor="@color/accent_purple"
-                    app:chipStrokeWidth="0.5dp"
-                    app:textEndPadding="12dp"
+
+                    android:checkable="true"
+                    app:checkedIconVisible="false"
+
+                    app:chipBackgroundColor="@drawable/chip_color_selector"
+                    app:chipStrokeColor="@drawable/chip_stroke_selector"
+                    app:chipStrokeWidth="1dp"
+
+                    android:textColor="@drawable/chip_text_selector"
+
                     app:textStartPadding="12dp"
-                    android:textColor="@color/text_inverse" />
+                    app:textEndPadding="12dp"/>
+
+                <!-- Study Chip -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_ai"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:text="Study"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="8dp"
+
+                    android:checkable="true"
+                    app:checkedIconVisible="false"
+
+                    app:chipBackgroundColor="@drawable/chip_color_selector"
+                    app:chipStrokeColor="@drawable/chip_stroke_selector"
+                    app:chipStrokeWidth="1dp"
+
+                    android:textColor="@drawable/chip_text_selector"
+
+                    app:textStartPadding="12dp"
+                    app:textEndPadding="12dp"/>
 
                 <!-- Work Chip -->
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_work"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:text="Work"
                     android:textSize="12sp"
                     android:layout_marginEnd="8dp"
-                    app:chipBackgroundColor="@color/surface"
-                    app:chipStrokeColor="@color/border"
-                    app:chipStrokeWidth="0.5dp"
-                    app:textEndPadding="12dp"
+
+                    android:checkable="true"
+                    app:checkedIconVisible="false"
+
+                    app:chipBackgroundColor="@drawable/chip_color_selector"
+                    app:chipStrokeColor="@drawable/chip_stroke_selector"
+                    app:chipStrokeWidth="1dp"
+
+                    android:textColor="@drawable/chip_text_selector"
+
                     app:textStartPadding="12dp"
-                    android:textColor="@color/text_secondary" />
+                    app:textEndPadding="12dp"/>
 
                 <!-- Personal Chip -->
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_personal"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:text="Personal"
                     android:textSize="12sp"
                     android:layout_marginEnd="8dp"
-                    app:chipBackgroundColor="@color/surface"
-                    app:chipStrokeColor="@color/border"
-                    app:chipStrokeWidth="0.5dp"
-                    app:textEndPadding="12dp"
+
+                    android:checkable="true"
+                    app:checkedIconVisible="false"
+
+                    app:chipBackgroundColor="@drawable/chip_color_selector"
+                    app:chipStrokeColor="@drawable/chip_stroke_selector"
+                    app:chipStrokeWidth="1dp"
+
+                    android:textColor="@drawable/chip_text_selector"
+
                     app:textStartPadding="12dp"
-                    android:textColor="@color/text_secondary" />
+                    app:textEndPadding="12dp"/>
 
                 <!-- Ideas Chip -->
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chip_ideas"
                     android:layout_width="wrap_content"
-                    android:layout_height="40dp"
+                    android:layout_height="45dp"
                     android:text="Ideas"
                     android:textSize="12sp"
                     android:layout_marginEnd="8dp"
-                    app:chipBackgroundColor="@color/surface"
-                    app:chipStrokeColor="@color/border"
-                    app:chipStrokeWidth="0.5dp"
-                    app:textEndPadding="12dp"
-                    app:textStartPadding="12dp"
-                    android:textColor="@color/text_secondary" />
 
-                <!-- AI Chip -->
-                <com.google.android.material.chip.Chip
-                    android:id="@+id/chip_ai"
-                    android:layout_width="wrap_content"
-                    android:layout_height="40dp"
-                    android:text="AI"
-                    android:textSize="12sp"
-                    app:chipBackgroundColor="@color/surface"
-                    app:chipStrokeColor="@color/border"
-                    app:chipStrokeWidth="0.5dp"
-                    app:textEndPadding="12dp"
+                    android:checkable="true"
+                    app:checkedIconVisible="false"
+
+                    app:chipBackgroundColor="@drawable/chip_color_selector"
+                    app:chipStrokeColor="@drawable/chip_stroke_selector"
+                    app:chipStrokeWidth="1dp"
+
+                    android:textColor="@drawable/chip_text_selector"
+
                     app:textStartPadding="12dp"
-                    android:textColor="@color/text_secondary" />
+                    app:textEndPadding="12dp"/>
+
+
 
             </LinearLayout>
 

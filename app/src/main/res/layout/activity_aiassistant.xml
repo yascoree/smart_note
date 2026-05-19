@@ -61,7 +61,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="● Active"
+                    android:text="Active"
                     android:textSize="11sp"
                     android:textColor="@color/accent_purple" />
 
@@ -95,7 +95,7 @@
                 <com.google.android.material.chip.Chip
                 android:id="@+id/chip_summarize"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="38dp"
                 android:layout_marginEnd="6dp"
                 android:text="Summarize"
                 android:textSize="11sp"
@@ -107,7 +107,7 @@
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_improve_writing"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="38dp"
                 android:layout_marginEnd="6dp"
                 android:text="Improve writing"
                 android:textSize="11sp"
@@ -119,7 +119,7 @@
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_find_ideas"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="38dp"
                 android:layout_marginEnd="6dp"
                 android:text="Find ideas"
                 android:textSize="11sp"
@@ -131,7 +131,7 @@
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_translate"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="38dp"
                 android:layout_marginEnd="6dp"
                 android:text="Translate"
                 android:textSize="11sp"
@@ -143,7 +143,7 @@
             <com.google.android.material.chip.Chip
                 android:id="@+id/chip_make_list"
                 android:layout_width="wrap_content"
-                android:layout_height="32dp"
+                android:layout_height="38dp"
                 android:text="Make list"
                 android:textSize="11sp"
                 app:chipBackgroundColor="@color/surface"

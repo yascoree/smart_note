@@ -16,6 +16,7 @@ class ProfileActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupUserInfo()
+        setupBackButton()
         setupLogoutButton()
     }
 
@@ -39,6 +40,12 @@ class ProfileActivity : AppCompatActivity() {
         binding.tvInitials.text = initials.ifBlank { "U" }
         binding.tvDisplayName.text = name
         binding.tvEmail.text = user?.email ?: "—"
+    }
+
+    private fun setupBackButton() {
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
     }
 
     private fun setupLogoutButton() {

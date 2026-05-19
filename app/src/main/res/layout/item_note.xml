@@ -17,7 +17,6 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Pinned Indicator -->
         <View
             android:id="@+id/pinned_indicator"
             android:layout_width="4dp"
@@ -26,7 +25,6 @@
             android:visibility="gone"
             android:layout_marginBottom="8dp" />
 
-        <!-- Title Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -50,7 +48,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_favorite_border"
-                android:tint="@color/text_tertiary"
+                app:tint="@color/text_muted"
                 android:scaleType="centerInside"
                 android:clickable="true"
                 android:focusable="true"
@@ -58,7 +56,6 @@
 
         </LinearLayout>
 
-        <!-- Content Preview -->
         <TextView
             android:id="@+id/tv_content"
             android:layout_width="match_parent"
@@ -67,11 +64,10 @@
             android:maxLines="3"
             android:ellipsize="end"
             android:text="Note content preview goes here..."
-            android:textColor="@color/text_tertiary"
+            android:textColor="@color/text_secondary"
             android:textSize="13sp"
             android:lineSpacingMultiplier="1.4" />
 
-        <!-- Tag Badge -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -88,12 +84,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Work"
-                android:textColor="@color/accent_purple"
+                android:textColor="@color/accent_purple_light"
                 android:textSize="8sp" />
 
         </LinearLayout>
 
-        <!-- Date and Actions Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -106,7 +101,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Jan 1, 2024"
-                android:textColor="@color/text_tertiary"
+                android:textColor="@color/text_muted"
                 android:textSize="11sp" />
 
             <ImageView
@@ -115,7 +110,7 @@
                 android:layout_height="24dp"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_edit"
-                android:tint="@color/text_tertiary"
+                app:tint="@color/text_muted"
                 android:scaleType="centerInside"
                 android:clickable="true"
                 android:focusable="true" />
@@ -125,7 +120,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_delete"
-                android:tint="@color/text_tertiary"
+                app:tint="@color/color_error"
                 android:scaleType="centerInside"
                 android:clickable="true"
                 android:focusable="true" />

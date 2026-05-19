@@ -15,18 +15,16 @@
         android:paddingBottom="24dp">
 
         <!-- Decorative Top Element -->
-        <View
+        <FrameLayout
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:background="@drawable/gradient_purple_blue"
-            android:alpha="0.15"
-            android:layout_marginBottom="40dp" />
+            android:background="@drawable/app_logo" />
 
         <!-- Header -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome back 👋"
+            android:text="Welcome back"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/text_primary"
@@ -138,7 +136,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="or continue with"
-                android:textColor="@color/text_tertiary"
+                android:textColor="@color/black"
                 android:textSize="12sp"
                 android:layout_marginHorizontal="12dp" />
 
@@ -157,8 +155,8 @@
             android:layout_height="56dp"
             android:text="Google"
             android:textSize="14sp"
-            android:textColor="@color/text_secondary"
-            app:backgroundTint="@color/surface_secondary"
+            android:textColor="@color/note_white"
+            app:backgroundTint="@color/accent_primary"
             app:strokeColor="@color/border"
             app:strokeWidth="0.5dp"
             app:cornerRadius="12dp"
@@ -168,20 +166,7 @@
             app:iconGravity="start"
             app:iconPadding="12dp" />
 
-        <!-- Apple Button (Optional) -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAppleSignin"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Apple"
-            android:textSize="14sp"
-            android:textColor="@color/text_secondary"
-            app:backgroundTint="@color/surface_secondary"
-            app:strokeColor="@color/border"
-            app:strokeWidth="0.5dp"
-            app:cornerRadius="12dp"
-            android:layout_marginBottom="24dp"
-            app:elevation="0dp" />
+
 
         <!-- Progress Bar -->
         <ProgressBar

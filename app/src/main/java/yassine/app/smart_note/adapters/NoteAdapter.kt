@@ -1,9 +1,10 @@
 package yassine.app.smart_note.adapters
 
-import android.graphics.Color
+import androidx.core.content.ContextCompat
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import yassine.app.smart_note.R
 import yassine.app.smart_note.databinding.ItemNoteBinding
 import yassine.app.smart_note.models.Note
 import java.text.SimpleDateFormat
@@ -34,15 +35,27 @@ class NoteAdapter(
 
     override fun getItemCount(): Int = notes.size
 
-    inner class NoteViewHolder(private val binding: ItemNoteBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class NoteViewHolder(private val binding: ItemNoteBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
         fun bind(note: Note) {
             binding.apply {
                 tvTitle.text = note.title.ifEmpty { "Sans titre" }
                 tvContent.text = note.content.ifEmpty { "Aucun contenu" }
                 tvDate.text = dateFormat.format(note.updatedAt)
+                tvTag.text = note.noteType
 
-                cardNote.setCardBackgroundColor(Color.parseColor(note.color))
+                val cardColorRes = when (note.noteType.lowercase(Locale.getDefault())) {
+                    "work" -> R.color.note_blue
+                    "ideas" -> R.color.note_purple
+                    "study" -> R.color.note_green
+                    "todo" -> R.color.note_yellow
+                    "meeting" -> R.color.accent_purple_bg
+                    else -> R.color.note_white
+                }
+                cardNote.setCardBackgroundColor(
+                    ContextCompat.getColor(root.context, cardColorRes)
+                )
 
                 ivFavorite.setImageResource(
                     if (note.isFavorite) android.R.drawable.btn_star_big_on

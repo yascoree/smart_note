@@ -10,9 +10,10 @@ data class Note(
     val userId: String = "",
     val title: String = "",
     val content: String = "",
-    val color: String = "#FFFFFF",
     @SerialName("is_favorite")
     val isFavorite: Boolean = false,
+    @SerialName("note_type")
+    val noteType: String = "Personal",
     @SerialName("created_at")
     val createdAt: Long = System.currentTimeMillis(),
     @SerialName("updated_at")
@@ -22,8 +23,8 @@ data class Note(
         id = id,
         title = title,
         content = content,
-        color = color,
         isFavorite = isFavorite,
+        noteType = noteType,
         createdAt = createdAt,
         updatedAt = updatedAt
     )
@@ -33,8 +34,8 @@ data class NoteEntity(
     val id: String,
     val title: String,
     val content: String,
-    val color: String,
     val isFavorite: Boolean,
+    val noteType: String = "Personal",
     val createdAt: Long,
     val updatedAt: Long
 )

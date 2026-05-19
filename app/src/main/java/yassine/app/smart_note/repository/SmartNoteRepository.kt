@@ -69,7 +69,7 @@ class SmartNoteRepository private constructor(private val context: Context) {
         }
     }
 
-    suspend fun addNote(title: String, content: String, color: String): Note = withContext(Dispatchers.IO) {
+    suspend fun addNote(title: String, content: String, noteType: String = "Personal"): Note = withContext(Dispatchers.IO) {
         val userId = requireUserId()
         val noteId = database.push().key ?: System.currentTimeMillis().toString()
         val now = System.currentTimeMillis()
@@ -78,8 +78,8 @@ class SmartNoteRepository private constructor(private val context: Context) {
             userId = userId,
             title = title.ifEmpty { "Sans titre" },
             content = content,
-            color = color,
             isFavorite = false,
+            noteType = noteType,
             createdAt = now,
             updatedAt = now
         )
@@ -93,7 +93,7 @@ class SmartNoteRepository private constructor(private val context: Context) {
         val updates = mapOf(
             "title" to note.title,
             "content" to note.content,
-            "color" to note.color,
+            "noteType" to note.noteType,
             "isFavorite" to note.isFavorite,
             "updatedAt" to now
         )

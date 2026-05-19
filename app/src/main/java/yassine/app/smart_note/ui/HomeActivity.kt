@@ -6,7 +6,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import yassine.app.smart_note.R
 import yassine.app.smart_note.adapters.NoteAdapter
@@ -23,6 +22,9 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var noteAdapter: NoteAdapter
     private val repository by lazy { SmartNoteRepository.getInstance(applicationContext) }
+    private var allNotes: List<Note> = emptyList()
+    private var selectedFilter: String = FILTER_ALL
+    private var currentQuery: String = ""
     
     private val viewModel: HomeViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
@@ -42,6 +44,7 @@ class HomeActivity : AppCompatActivity() {
         setupObservers()
         setupClickListeners()
         setupBottomNavigation()
+        setupChips()
 
         binding.tvGreeting.text = "Good morning, ${repository.getUserName()}"
 
@@ -73,9 +76,8 @@ class HomeActivity : AppCompatActivity() {
                     // Show progress if needed
                 }
                 is Resource.Success -> {
-                    val notes = resource.data
-                    noteAdapter.updateNotes(notes)
-                    updateEmptyState(notes.isEmpty())
+                    allNotes = resource.data
+                    applyFilters()
                 }
                 is Resource.Error -> {
                     Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show()
@@ -87,8 +89,8 @@ class HomeActivity : AppCompatActivity() {
         viewModel.searchResults.observe(this) { resource ->
             when (resource) {
                 is Resource.Success -> {
-                    noteAdapter.updateNotes(resource.data)
-                    updateEmptyState(resource.data.isEmpty())
+                    allNotes = resource.data
+                    applyFilters()
                 }
                 else -> {}
             }
@@ -124,7 +126,8 @@ class HomeActivity : AppCompatActivity() {
         binding.etSearch.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.searchNotes(s.toString())
+                currentQuery = s?.toString().orEmpty()
+                applyFilters()
             }
             override fun afterTextChanged(s: android.text.Editable?) {}
         })
@@ -153,9 +156,76 @@ class HomeActivity : AppCompatActivity() {
             putExtra("note_id", note.id)
             putExtra("note_title", note.title)
             putExtra("note_content", note.content)
-            putExtra("note_color", note.color)
             putExtra("note_favorite", note.isFavorite)
         }
         startActivity(intent)
+    }
+
+
+    private fun setupChips() {
+
+        val chips = listOf(
+            binding.chipAll,
+            binding.chipWork,
+            binding.chipPersonal,
+            binding.chipIdeas,
+            binding.chipAi
+        )
+
+        chips.forEach { chip ->
+            chip.setOnClickListener {
+
+                // reset all
+                chips.forEach { it.isChecked = false }
+
+                // activate selected
+                chip.isChecked = true
+
+                selectedFilter = when (chip.id) {
+                    R.id.chip_work -> FILTER_WORK
+                    R.id.chip_personal -> FILTER_PERSONAL
+                    R.id.chip_ideas -> FILTER_IDEAS
+                    R.id.chip_ai -> FILTER_STUDY
+                    else -> FILTER_ALL
+                }
+                applyFilters()
+            }
+        }
+
+        // default
+        binding.chipAll.isChecked = true
+        selectedFilter = FILTER_ALL
+        applyFilters()
+    }
+
+    private fun applyFilters() {
+        val query = currentQuery.trim().lowercase()
+
+        val filtered = allNotes.filter { note ->
+            val matchesType = when (selectedFilter) {
+                FILTER_WORK -> note.noteType.equals("Work", ignoreCase = true)
+                FILTER_PERSONAL -> note.noteType.equals("Personal", ignoreCase = true)
+                FILTER_IDEAS -> note.noteType.equals("Ideas", ignoreCase = true)
+                FILTER_STUDY -> note.noteType.equals("Study", ignoreCase = true)
+                else -> true
+            }
+
+            val matchesQuery = query.isBlank() ||
+                note.title.lowercase().contains(query) ||
+                note.content.lowercase().contains(query)
+
+            matchesType && matchesQuery
+        }
+
+        noteAdapter.updateNotes(filtered)
+        updateEmptyState(filtered.isEmpty())
+    }
+
+    companion object {
+        private const val FILTER_ALL = "ALL"
+        private const val FILTER_WORK = "WORK"
+        private const val FILTER_PERSONAL = "PERSONAL"
+        private const val FILTER_IDEAS = "IDEAS"
+        private const val FILTER_STUDY = "STUDY"
     }
 }
