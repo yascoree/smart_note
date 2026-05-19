@@ -18,6 +18,7 @@ class SmartNoteRepository private constructor(private val context: Context) {
     private val database = FirebaseDatabase.getInstance().reference
     private val sharedPreferences = context.getSharedPreferences("SmartNotePrefs", Context.MODE_PRIVATE)
     private val syncedBackendNotesKey = "synced_backend_notes"
+    private val syncedBackendUserKey = "synced_backend_user"
 
     companion object {
         @Volatile
@@ -116,22 +117,33 @@ class SmartNoteRepository private constructor(private val context: Context) {
     // ==================== AI ASSISTANT ====================
 
     suspend fun syncNotesToBackend(notes: List<Note>): Int = withContext(Dispatchers.IO) {
+        ensureSyncStateForCurrentUser()
         val syncedIds = getSyncedBackendNoteIds().toMutableSet()
         var syncedCount = 0
 
         notes.forEach { note ->
             val syncKey = note.syncKey()
             if (syncedIds.contains(syncKey)) {
+                android.util.Log.d("SmartNoteRepository", "Skipping already synced note: id=${note.id}, key=$syncKey")
                 return@forEach
             }
 
             val textToIndex = note.toBackendText()
             if (textToIndex.isBlank()) {
+                android.util.Log.w("SmartNoteRepository", "Skipping blank note for backend index: id=${note.id}")
                 return@forEach
             }
 
             try {
-                RetrofitInstance.api.pushNote(BackendNoteRequest(text = textToIndex))
+                android.util.Log.d(
+                    "SmartNoteRepository",
+                    "Pushing note to backend: id=${note.id}, updatedAt=${note.updatedAt}, key=$syncKey, preview=${textToIndex.take(120)}"
+                )
+                val pushResponse = RetrofitInstance.api.pushNote(BackendNoteRequest(text = textToIndex))
+                android.util.Log.d(
+                    "SmartNoteRepository",
+                    "Push response for id=${note.id}: code=${pushResponse.code()}, successful=${pushResponse.isSuccessful}"
+                )
                 syncedIds.add(syncKey)
                 syncedCount++
             } catch (e: Exception) {
@@ -186,6 +198,24 @@ class SmartNoteRepository private constructor(private val context: Context) {
 
     private fun saveSyncedBackendNoteIds(ids: Set<String>) {
         sharedPreferences.edit().putStringSet(syncedBackendNotesKey, ids).apply()
+    }
+
+    private fun ensureSyncStateForCurrentUser() {
+        val currentUserId = requireUserId()
+        val lastSyncedUserId = sharedPreferences.getString(syncedBackendUserKey, null)
+        if (lastSyncedUserId != currentUserId) {
+            sharedPreferences.edit()
+                .remove(syncedBackendNotesKey)
+                .putString(syncedBackendUserKey, currentUserId)
+                .apply()
+            android.util.Log.d("SmartNoteRepository", "Reset backend sync cache for user: $currentUserId")
+        }
+    }
+
+    suspend fun forceResyncAllNotes(notes: List<Note>): Int = withContext(Dispatchers.IO) {
+        sharedPreferences.edit().remove(syncedBackendNotesKey).apply()
+        android.util.Log.d("SmartNoteRepository", "Forcing full backend resync for ${notes.size} note(s)")
+        syncNotesToBackend(notes)
     }
 
     private fun Note.syncKey(): String = "$id:$updatedAt"
