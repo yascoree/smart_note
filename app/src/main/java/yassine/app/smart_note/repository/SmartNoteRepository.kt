@@ -2,19 +2,22 @@ package yassine.app.smart_note.repository
 
 import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import yassine.app.smart_note.api.RetrofitInstance
+import yassine.app.smart_note.models.BackendNoteRequest
 import yassine.app.smart_note.models.AskRequest
 import yassine.app.smart_note.models.AskResponse
 import yassine.app.smart_note.models.Note
-import java.util.UUID
 
-class SmartNoteRepository private constructor(context: Context) {
+class SmartNoteRepository private constructor(private val context: Context) {
 
     private val auth = FirebaseAuth.getInstance()
-    private val supabaseRepo = SupabaseNoteRepository()
+    private val database = FirebaseDatabase.getInstance().reference
+    private val sharedPreferences = context.getSharedPreferences("SmartNotePrefs", Context.MODE_PRIVATE)
+    private val syncedBackendNotesKey = "synced_backend_notes"
 
     companion object {
         @Volatile
@@ -47,25 +50,32 @@ class SmartNoteRepository private constructor(context: Context) {
         return auth.currentUser?.email ?: ""
     }
 
-    // ==================== NOTES (SUPABASE) ====================
+    // ==================== NOTES (FIREBASE REALTIME DB) ====================
 
     suspend fun getAllNotes(): List<Note> = withContext(Dispatchers.IO) {
-        supabaseRepo.getAllNotes(requireUserId())
+        val userId = requireUserId()
+        val snapshot = database.child("users").child(userId).child("notes").get().await()
+        snapshot.children.mapNotNull { it.getValue(Note::class.java) }
     }
 
     suspend fun getFavoriteNotes(): List<Note> = withContext(Dispatchers.IO) {
-        supabaseRepo.getFavoriteNotes(requireUserId())
+        getAllNotes().filter { it.isFavorite }
     }
 
     suspend fun searchNotes(query: String): List<Note> = withContext(Dispatchers.IO) {
-        supabaseRepo.searchNotes(requireUserId(), query)
+        val lower = query.lowercase()
+        getAllNotes().filter { note ->
+            note.title.lowercase().contains(lower) || note.content.lowercase().contains(lower)
+        }
     }
 
     suspend fun addNote(title: String, content: String, color: String): Note = withContext(Dispatchers.IO) {
+        val userId = requireUserId()
+        val noteId = database.push().key ?: System.currentTimeMillis().toString()
         val now = System.currentTimeMillis()
         val note = Note(
-            id = UUID.randomUUID().toString(),
-            userId = requireUserId(),
+            id = noteId,
+            userId = userId,
             title = title.ifEmpty { "Sans titre" },
             content = content,
             color = color,
@@ -73,131 +83,116 @@ class SmartNoteRepository private constructor(context: Context) {
             createdAt = now,
             updatedAt = now
         )
-        supabaseRepo.addNote(note)
+        database.child("users").child(userId).child("notes").child(noteId).setValue(note).await()
+        note
     }
 
     suspend fun updateNote(note: Note): Note = withContext(Dispatchers.IO) {
+        val userId = requireUserId()
         val now = System.currentTimeMillis()
         val updates = mapOf(
             "title" to note.title,
             "content" to note.content,
             "color" to note.color,
-            "is_favorite" to note.isFavorite,
-            "updated_at" to now
+            "isFavorite" to note.isFavorite,
+            "updatedAt" to now
         )
-        supabaseRepo.updateNote(requireUserId(), note.id, updates)
+        database.child("users").child(userId).child("notes").child(note.id).updateChildren(updates).await()
+        note.copy(updatedAt = now)
     }
 
     suspend fun deleteNote(noteId: String): Boolean = withContext(Dispatchers.IO) {
-        supabaseRepo.deleteNote(requireUserId(), noteId)
+        val userId = requireUserId()
+        database.child("users").child(userId).child("notes").child(noteId).removeValue().await()
+        true
     }
 
     suspend fun toggleFavorite(noteId: String, isFavorite: Boolean): Boolean = withContext(Dispatchers.IO) {
-        supabaseRepo.toggleFavorite(requireUserId(), noteId, isFavorite)
-    }
-
-    fun observeNotes(): Flow<List<Note>> {
-        return supabaseRepo.observeNotes(requireUserId())
+        val userId = requireUserId()
+        database.child("users").child(userId).child("notes").child(noteId).child("isFavorite").setValue(isFavorite).await()
+        true
     }
 
     // ==================== AI ASSISTANT ====================
 
-    suspend fun sendAIMessage(question: String): AskResponse = withContext(Dispatchers.IO) {
-        val notes = getAllNotes()
-        if (shouldAnswerFromLocalNotes(question)) {
-            return@withContext AskResponse(getNotesBasedResponse(question, notes))
+    suspend fun syncNotesToBackend(notes: List<Note>): Int = withContext(Dispatchers.IO) {
+        val syncedIds = getSyncedBackendNoteIds().toMutableSet()
+        var syncedCount = 0
+
+        notes.forEach { note ->
+            val syncKey = note.syncKey()
+            if (syncedIds.contains(syncKey)) {
+                return@forEach
+            }
+
+            val textToIndex = note.toBackendText()
+            if (textToIndex.isBlank()) {
+                return@forEach
+            }
+
+            try {
+                RetrofitInstance.api.pushNote(BackendNoteRequest(text = textToIndex))
+                syncedIds.add(syncKey)
+                syncedCount++
+            } catch (e: Exception) {
+                android.util.Log.e("SmartNoteRepository", "Failed syncing note ${note.id}", e)
+            }
         }
 
+        saveSyncedBackendNoteIds(syncedIds)
+        syncedCount
+    }
+
+    suspend fun sendAIMessage(question: String): AskResponse = withContext(Dispatchers.IO) {
         try {
-            val contextualQuestion = buildQuestionWithNotes(question, notes)
-            val request = AskRequest(contextualQuestion)
+            val request = AskRequest(question = question)
+            android.util.Log.d("SmartNoteRepository", "Sending AI request to /ask")
+            android.util.Log.d("SmartNoteRepository", "AI question payload: $question")
             RetrofitInstance.api.sendMessage(request)
         } catch (e: Exception) {
             e.printStackTrace()
-            AskResponse(getFallbackResponse(question, notes))
+            android.util.Log.e("SmartNoteRepository", "AI request failed", e)
+            AskResponse(answer = getFallbackResponse(question))
         }
     }
 
-    private fun buildQuestionWithNotes(question: String, notes: List<Note>): String {
-        if (notes.isEmpty()) return question
-
-        val contextBlock = notes
-            .take(20)
-            .joinToString("\n") { note ->
-                val compactContent = note.content.replace("\n", " ").trim()
-                "- ${note.title.ifBlank { "Sans titre" }}: ${compactContent.take(250)}"
-            }
-
-        return buildString {
-            appendLine("Question utilisateur:")
-            appendLine(question)
-            appendLine()
-            appendLine("Contexte notes utilisateur (réponds en te basant sur ces notes):")
-            append(contextBlock)
-        }
-    }
-
-    private fun shouldAnswerFromLocalNotes(question: String): Boolean {
-        val lower = question.lowercase()
-        return lower.contains("mes notes") ||
-            lower.contains("my notes") ||
-            lower.contains("quelles notes") ||
-            lower.contains("what notes") ||
-            lower.contains("résume mes notes") ||
-            lower.contains("resume mes notes") ||
-            lower.contains("summarize my notes") ||
-            (lower.contains("summary") && lower.contains("notes"))
-    }
-
-    private fun getNotesBasedResponse(question: String, notes: List<Note>): String {
-        if (notes.isEmpty()) {
-            return "Vous n'avez pas encore ajouté de notes. Ajoutez une note puis demandez-moi un résumé."
-        }
-
-        val lower = question.lowercase()
-        val sortedNotes = notes.sortedByDescending { it.updatedAt }
-
-        if (lower.contains("résume") || lower.contains("resume") || lower.contains("summary") || lower.contains("summar")) {
-            val favorites = sortedNotes.count { it.isFavorite }
-            val lines = sortedNotes.take(8).joinToString("\n") { note ->
-                val preview = note.content.replace("\n", " ").trim().take(120)
-                "• ${note.title.ifBlank { "Sans titre" }}: ${if (preview.isBlank()) "(sans contenu)" else preview}"
-            }
-            return "Voici le résumé de vos notes:\n\nTotal: ${sortedNotes.size} note(s)\nFavoris: $favorites\n\n$lines"
-        }
-
-        val list = sortedNotes.take(12).joinToString("\n") { note ->
-            "• ${note.title.ifBlank { "Sans titre" }}"
-        }
-        return "Voici vos notes récentes:\n\n$list"
-    }
-
-    private fun getFallbackResponse(question: String, notes: List<Note>): String {
-        val lower = question.lowercase()
-        if (lower.contains("mes notes") || lower.contains("my notes")) {
-            return getNotesBasedResponse(question, notes)
-        }
-
+    private fun getFallbackResponse(question: String): String {
         return when {
             question.contains("note", ignoreCase = true) &&
-                (question.contains("génère", ignoreCase = true) || question.contains("genere", ignoreCase = true)) -> {
+                    (question.contains("génère", ignoreCase = true) || question.contains("genere", ignoreCase = true)) -> {
                 "📝 **Note générée:**\n\nVoici une note basée sur votre demande:\n\n---\n${question.replace("génère", "").replace("genere", "").replace("note", "").trim()}\n\n---\n\n💡 Souhaitez-vous sauvegarder cette note?"
             }
             question.contains("résumé", ignoreCase = true) ||
-                question.contains("resume", ignoreCase = true) -> {
+                    question.contains("resume", ignoreCase = true) -> {
                 "📄 **Résumé:**\n\n• Premier point important\n• Deuxième point clé\n• Troisième élément essentiel\n\n---\n\nVoulez-vous que je développe un point particulier?"
             }
             question.contains("améliore", ignoreCase = true) ||
-                question.contains("amelior", ignoreCase = true) -> {
+                    question.contains("amelior", ignoreCase = true) -> {
                 "✏️ **Texte amélioré:**\n\nVersion optimisée avec une meilleure grammaire, un vocabulaire plus riche et une structure plus claire.\n\n**Améliorations:**\n• Correction grammaticale\n• Enrichissement lexical\n• Meilleure fluidité"
             }
             question.contains("todo", ignoreCase = true) ||
-                question.contains("liste", ignoreCase = true) -> {
+                    question.contains("liste", ignoreCase = true) -> {
                 "✅ **To-Do List générée:**\n\n□ **Priorité haute:** Tâche principale\n□ **Priorité moyenne:** Tâches secondaires\n□ **Priorité basse:** Points optionnels\n\n---\n\nCommencez par les priorités hautes!"
             }
             else -> {
                 "🤖 **Assistant IA - Smart Note**\n\nJe peux vous aider avec:\n\n📝 **Générer une note**\n   \"Génère une note sur le développement mobile\"\n\n📄 **Résumer un texte**\n   \"Résume ce texte: [votre texte]\"\n\n✏️ **Améliorer l'écriture**\n   \"Améliore ce texte: [votre texte]\"\n\n✅ **Créer une to-do list**\n   \"Crée une liste pour mon projet\"\n\nComment puis-je vous aider aujourd'hui?"
             }
         }
+    }
+
+    private fun getSyncedBackendNoteIds(): Set<String> {
+        return sharedPreferences.getStringSet(syncedBackendNotesKey, emptySet()) ?: emptySet()
+    }
+
+    private fun saveSyncedBackendNoteIds(ids: Set<String>) {
+        sharedPreferences.edit().putStringSet(syncedBackendNotesKey, ids).apply()
+    }
+
+    private fun Note.syncKey(): String = "$id:$updatedAt"
+
+    private fun Note.toBackendText(): String {
+        val titlePart = title.trim()
+        val contentPart = content.trim()
+        return listOf(titlePart, contentPart).filter { it.isNotBlank() }.joinToString("\n")
     }
 }

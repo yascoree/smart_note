@@ -17,6 +17,7 @@ class NoteDetailsActivity : AppCompatActivity() {
     private var isFavorite = false
     private var noteTitle = ""
     private var noteContent = ""
+    private var noteColor = "#FFFFFF"
     private val repository by lazy { SmartNoteRepository.getInstance(applicationContext) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +34,7 @@ class NoteDetailsActivity : AppCompatActivity() {
         noteId = intent.getStringExtra("note_id") ?: ""
         noteTitle = intent.getStringExtra("note_title") ?: ""
         noteContent = intent.getStringExtra("note_content") ?: ""
-        val color = intent.getStringExtra("note_color") ?: "#FFFFFF"
+        noteColor = intent.getStringExtra("note_color") ?: "#FFFFFF"
         isFavorite = intent.getBooleanExtra("note_favorite", false)
 
         binding.tvTitle.text = noteTitle
@@ -41,9 +42,9 @@ class NoteDetailsActivity : AppCompatActivity() {
 
         // Set background color
         try {
-            binding.cardContent.setCardBackgroundColor(Color.parseColor(color))
+            binding.root.setBackgroundColor(Color.parseColor(noteColor))
         } catch (e: Exception) {
-            binding.cardContent.setCardBackgroundColor(Color.WHITE)
+            binding.root.setBackgroundColor(Color.WHITE)
         }
 
         // Set favorite icon
@@ -51,17 +52,26 @@ class NoteDetailsActivity : AppCompatActivity() {
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.title = "Note Details"
+        binding.btnBack.setOnClickListener { finish() }
+        binding.btnMore.setOnClickListener {
+            if (noteId.isBlank()) {
+                Toast.makeText(this, "Note introuvable", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            val intent = Intent(this, AddNoteActivity::class.java).apply {
+                putExtra("is_edit", true)
+                putExtra("note_id", noteId)
+                putExtra("note_title", noteTitle)
+                putExtra("note_content", noteContent)
+                putExtra("note_color", noteColor)
+            }
+            startActivity(intent)
+            finish()
+        }
     }
 
     private fun setupClickListeners() {
-        binding.fabEdit.setOnClickListener {
-            Toast.makeText(this, "Edit feature coming soon", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.fabShare.setOnClickListener {
+        binding.btnShare.setOnClickListener {
             val shareIntent = Intent().apply {
                 action = Intent.ACTION_SEND
                 putExtra(Intent.EXTRA_TEXT, "$noteTitle\n\n$noteContent")
@@ -70,7 +80,7 @@ class NoteDetailsActivity : AppCompatActivity() {
             startActivity(Intent.createChooser(shareIntent, "Share Note"))
         }
 
-        binding.fabFavorite.setOnClickListener {
+        binding.btnFavorite.setOnClickListener {
             if (noteId.isBlank()) {
                 Toast.makeText(this, "Note introuvable", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
@@ -95,33 +105,13 @@ class NoteDetailsActivity : AppCompatActivity() {
                 }
             }
         }
-
-        binding.fabDelete.setOnClickListener {
-            if (noteId.isBlank()) {
-                Toast.makeText(this, "Note introuvable", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-            lifecycleScope.launch {
-                try {
-                    val deleted = repository.deleteNote(noteId)
-                    if (deleted) {
-                        Toast.makeText(this@NoteDetailsActivity, "Note supprimée", Toast.LENGTH_SHORT).show()
-                        finish()
-                    } else {
-                        Toast.makeText(this@NoteDetailsActivity, "Erreur lors de la suppression", Toast.LENGTH_SHORT).show()
-                    }
-                } catch (e: Exception) {
-                    Toast.makeText(this@NoteDetailsActivity, e.message ?: "Erreur lors de la suppression", Toast.LENGTH_SHORT).show()
-                }
-            }
-        }
     }
 
     private fun updateFavoriteIcon() {
         if (isFavorite) {
-            binding.fabFavorite.setImageResource(android.R.drawable.btn_star_big_on)
+            binding.btnFavorite.setIconResource(android.R.drawable.btn_star_big_on)
         } else {
-            binding.fabFavorite.setImageResource(android.R.drawable.btn_star_big_off)
+            binding.btnFavorite.setIconResource(android.R.drawable.btn_star_big_off)
         }
     }
 

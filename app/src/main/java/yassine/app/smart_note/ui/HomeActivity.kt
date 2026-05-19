@@ -2,19 +2,19 @@ package yassine.app.smart_note.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import yassine.app.smart_note.R
 import yassine.app.smart_note.adapters.NoteAdapter
 import yassine.app.smart_note.databinding.ActivityHomeBinding
-import yassine.app.smart_note.firebase.FirebaseAuthService
 import yassine.app.smart_note.models.Note
-import yassine.app.smart_note.repository.FirebaseAuthRepository
 import yassine.app.smart_note.repository.SmartNoteRepository
+import yassine.app.smart_note.ui.AiAssistantActivity
+import yassine.app.smart_note.ui.ProfileActivity
 import yassine.app.smart_note.utils.Resource
 import yassine.app.smart_note.viewmodel.HomeViewModel
 
@@ -23,6 +23,7 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var noteAdapter: NoteAdapter
     private val repository by lazy { SmartNoteRepository.getInstance(applicationContext) }
+    
     private val viewModel: HomeViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -37,10 +38,12 @@ class HomeActivity : AppCompatActivity() {
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupToolbar()
         setupRecyclerView()
         setupObservers()
         setupClickListeners()
+        setupBottomNavigation()
+
+        binding.tvGreeting.text = "Good morning, ${repository.getUserName()}"
 
         viewModel.loadNotes()
     }
@@ -48,11 +51,6 @@ class HomeActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.loadNotes()
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "Mes Notes"
     }
 
     private fun setupRecyclerView() {
@@ -72,46 +70,49 @@ class HomeActivity : AppCompatActivity() {
         viewModel.notesState.observe(this) { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    // Afficher chargement
+                    // Show progress if needed
                 }
                 is Resource.Success -> {
-                    noteAdapter.updateNotes(resource.data ?: emptyList())
-                    updateStats(resource.data ?: emptyList())
-                    updateEmptyState(resource.data.isNullOrEmpty())
+                    val notes = resource.data
+                    noteAdapter.updateNotes(notes)
+                    updateEmptyState(notes.isEmpty())
                 }
                 is Resource.Error -> {
                     Toast.makeText(this, resource.message, Toast.LENGTH_SHORT).show()
                 }
+                else -> {}
             }
         }
 
         viewModel.searchResults.observe(this) { resource ->
-            if (resource is Resource.Success) {
-                noteAdapter.updateNotes(resource.data ?: emptyList())
-                updateEmptyState(resource.data.isNullOrEmpty())
+            when (resource) {
+                is Resource.Success -> {
+                    noteAdapter.updateNotes(resource.data)
+                    updateEmptyState(resource.data.isEmpty())
+                }
+                else -> {}
             }
         }
 
         viewModel.deleteState.observe(this) { resource ->
-            if (resource is Resource.Success && resource.data == true) {
-                Toast.makeText(this, "Note supprimée", Toast.LENGTH_SHORT).show()
+            when (resource) {
+                is Resource.Success -> {
+                    if (resource.data) {
+                        Toast.makeText(this, "Note supprimée", Toast.LENGTH_SHORT).show()
+                    }
+                }
+                else -> {}
             }
         }
     }
 
-    private fun updateStats(notes: List<Note>) {
-        val favorites = notes.count { it.isFavorite }
-        binding.tvTotalNotes.text = notes.size.toString()
-        binding.tvFavoriteNotes.text = favorites.toString()
-    }
-
     private fun updateEmptyState(isEmpty: Boolean) {
         if (isEmpty) {
-            binding.layoutEmpty.visibility = android.view.View.VISIBLE
-            binding.rvNotes.visibility = android.view.View.GONE
+            binding.layoutEmpty.visibility = View.VISIBLE
+            binding.rvNotes.visibility = View.GONE
         } else {
-            binding.layoutEmpty.visibility = android.view.View.GONE
-            binding.rvNotes.visibility = android.view.View.VISIBLE
+            binding.layoutEmpty.visibility = View.GONE
+            binding.rvNotes.visibility = View.VISIBLE
         }
     }
 
@@ -129,6 +130,24 @@ class HomeActivity : AppCompatActivity() {
         })
     }
 
+    private fun setupBottomNavigation() {
+        binding.bottomNavigation.selectedItemId = R.id.nav_home
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> true
+                R.id.nav_ai -> {
+                    startActivity(Intent(this, AiAssistantActivity::class.java))
+                    true
+                }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    true
+                }
+                else -> false
+            }
+        }
+    }
+
     private fun openNoteDetail(note: Note) {
         val intent = Intent(this, NoteDetailsActivity::class.java).apply {
             putExtra("note_id", note.id)
@@ -139,37 +158,4 @@ class HomeActivity : AppCompatActivity() {
         }
         startActivity(intent)
     }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.home_menu, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_ai_assistant -> {
-                startActivity(Intent(this, AiAssistantActivity::class.java))
-                true
-            }
-            R.id.action_logout -> {
-                logout()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun logout() {
-        val authService = FirebaseAuthService(this)
-        val authRepository = FirebaseAuthRepository(authService)
-        authRepository.signOut()
-
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
-    }
-
-// Dans onOptionsItemSelected
-
 }

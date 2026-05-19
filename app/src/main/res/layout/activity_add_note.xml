@@ -4,188 +4,218 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="@color/background">
 
-    <!-- Toolbar -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <!-- Top Bar -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/white"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:title="New Note"
-        app:titleTextColor="#1A1A1A" />
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@color/background">
 
-    <ScrollView
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            app:tint="@color/text_primary"
+            android:contentDescription="Back"
+            android:scaleType="centerInside" />
+
+        <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tv_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:textColor="@color/accent_purple"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:clickable="true"
+            android:focusable="true" />
+
+    </LinearLayout>
+
+    <!-- Formatting Toolbar -->
+        <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:padding="16dp">
+        android:layout_height="56dp"
+        android:scrollbars="none"
+            android:background="@color/background">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-            <!-- Title Input -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                <ImageButton
+                android:id="@+id/btn_bold"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_tertiary"
+                android:scaleType="centerInside"
+                android:contentDescription="Bold" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Title"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <ImageButton
+                android:id="@+id/btn_italic"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_tertiary"
+                android:scaleType="centerInside"
+                android:contentDescription="Italic" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="textCapSentences"
-                        android:maxLines="2"
-                        android:textSize="18sp"
-                        android:textStyle="bold" />
+            <ImageButton
+                android:id="@+id/btn_underline"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_tertiary"
+                android:scaleType="centerInside"
+                android:contentDescription="Underline" />
 
-                </com.google.android.material.textfield.TextInputLayout>
+            <ImageButton
+                android:id="@+id/btn_list"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_tertiary"
+                android:scaleType="centerInside"
+                android:contentDescription="List" />
 
-            </com.google.android.material.card.MaterialCardView>
+            <ImageButton
+                android:id="@+id/btn_checklist"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_tertiary"
+                android:scaleType="centerInside"
+                android:contentDescription="Checklist" />
 
-            <!-- Content Input -->
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                <ImageButton
+                android:id="@+id/btn_image"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_camera"
+                app:tint="@color/text_tertiary"
+                android:scaleType="centerInside"
+                android:contentDescription="Image" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Content"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+            <ImageButton
+                android:id="@+id/btn_tag"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_tertiary"
+                android:scaleType="centerInside"
+                android:contentDescription="Tag" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/et_content"
-                        android:layout_width="match_parent"
-                        android:layout_height="200dp"
-                        android:gravity="top"
-                        android:inputType="textMultiLine"
-                        android:textSize="14sp" />
-
-                </com.google.android.material.textfield.TextInputLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-            <!-- Color Selection -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="8dp"
-                android:text="Note Color"
-                android:textColor="#1A1A1A"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <View
-                    android:id="@+id/color_white"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_color_white"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <View
-                    android:id="@+id/color_red"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_color_red"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <View
-                    android:id="@+id/color_blue"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_color_blue"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <View
-                    android:id="@+id/color_green"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_color_green"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <View
-                    android:id="@+id/color_yellow"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:layout_marginEnd="8dp"
-                    android:background="@drawable/bg_color_yellow"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-                <View
-                    android:id="@+id/color_purple"
-                    android:layout_width="40dp"
-                    android:layout_height="40dp"
-                    android:background="@drawable/bg_color_purple"
-                    android:clickable="true"
-                    android:focusable="true" />
-
-            </LinearLayout>
-
-            <!-- Action Buttons -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_cancel"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_marginEnd="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_outline"
-                    android:text="Cancel"
-                    android:textAllCaps="false"
-                    android:textColor="#1A1A1A"
-                    android:textSize="14sp" />
-
-                <Button
-                    android:id="@+id/btn_save"
-                    android:layout_width="0dp"
-                    android:layout_height="56dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/button_gradient"
-                    android:text="Save Note"
-                    android:textAllCaps="false"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
-
-            </LinearLayout>
+            <ImageButton
+                android:id="@+id/btn_voice"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_margin="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="@color/text_tertiary"
+                android:scaleType="centerInside"
+                android:contentDescription="Voice" />
 
         </LinearLayout>
 
-    </ScrollView>
+    </HorizontalScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/border" />
+
+    <!-- Content Area -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="100dp">
+
+                <!-- Title Input -->
+                <EditText
+                    android:id="@+id/et_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:hint="Note title..."
+                    android:textColorHint="@color/black"
+                    android:textColor="@color/text_primary"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:inputType="textCapSentences"
+                    android:letterSpacing="-0.02"
+                    android:paddingBottom="12dp" />
+
+                <!-- Content Input -->
+                <EditText
+                    android:id="@+id/et_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:hint="Start writing..."
+                    android:textColorHint="@color/text_tertiary"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="15sp"
+                    android:inputType="textMultiLine"
+                    android:gravity="top"
+                    android:lineSpacingMultiplier="1.7"
+                    android:minHeight="300dp" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <!-- Ask AI Floating Pill -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_ask_ai"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="16dp"
+            android:text="Ask AI to help"
+            android:textColor="@color/accent_purple"
+            android:textSize="13sp"
+            app:backgroundTint="@color/accent_purple_bg"
+            app:cornerRadius="24dp"
+            app:strokeColor="@color/accent_purple"
+            app:strokeWidth="0.5dp"
+            app:icon="@drawable/ic_ai_avatar"
+            app:iconGravity="start"
+            app:iconPadding="8dp"
+            app:elevation="2dp" />
+
+    </FrameLayout>
 
 </LinearLayout>

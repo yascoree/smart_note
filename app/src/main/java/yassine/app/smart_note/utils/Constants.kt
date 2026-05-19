@@ -1,9 +1,32 @@
 package yassine.app.smart_note.utils
 
+import android.os.Build
+
 object Constants {
     // API
-    const val BASE_URL = "http://192.168.11.127:8000"  // Pour l'émulateur
-    // Pour un téléphone physique: "http://192.168.1.x:8000"
+    // Default LAN URL (change to your machine IP when testing on a real device)
+    private const val LAN_BASE_URL = "http://192.168.11.127:8000/"
+    // Emulator loopback address for Android emulator
+    private const val EMULATOR_BASE_URL = "http://10.0.2.2:8000/"
+
+    /**
+     * Returns the appropriate base URL depending on whether the app runs on an emulator.
+     * - Emulator: `10.0.2.2`
+     * - Real device: change `LAN_BASE_URL` to your machine IP
+     */
+    fun getBaseUrl(): String {
+        return if (isRunningOnEmulator()) EMULATOR_BASE_URL else LAN_BASE_URL
+    }
+
+    fun isRunningOnEmulator(): Boolean {
+        return (Build.FINGERPRINT.startsWith("generic")
+                || Build.FINGERPRINT.lowercase().contains("vbox")
+                || Build.MODEL.contains("Emulator")
+                || Build.MODEL.contains("Android SDK built for x86")
+                || Build.MANUFACTURER.contains("Genymotion")
+                || Build.BRAND.startsWith("generic")
+                || Build.DEVICE.startsWith("generic"))
+    }
 
     const val CONNECTION_TIMEOUT = 30L
     const val READ_TIMEOUT = 30L
@@ -21,7 +44,7 @@ object Constants {
     const val KEY_USER_ID = "user_id"
 
     // AI Assistant
-    const val WELCOME_MESSAGE = "Bonjour! Je suis votre assistant IA.\n\nJe peux vous aider avec:\n📝 Générer des notes\n📄 Résumer des textes\n✏️ Améliorer votre écriture\n✅ Créer des listes de tâches\n\nQue puis-je faire pour vous aujourd'hui?"
+    const val WELCOME_MESSAGE = "🤖 **Assistant IA - Smart Note**\n\nJe peux vous aider avec:\n\n📝 **Générer une note**\n   \"Génère une note sur le développement mobile\"\n\n📄 **Résumer un texte**\n   \"Résume ce texte: [votre texte]\"\n\n✏️ **Améliorer l'écriture**\n   \"Améliore ce texte: [votre texte]\"\n\n✅ **Créer une to-do list**\n   \"Crée une liste pour mon projet\"\n\nComment puis-je vous aider aujourd'hui?"
 
     // Note Colors
     val NOTE_COLORS = listOf(
@@ -32,7 +55,4 @@ object Constants {
         "Blanc", "Rouge", "Bleu", "Vert", "Jaune", "Violet"
     )
 
-    //Supabase
-    const val SUPABASE_URL = "https://poatgtndaekixwfzonwn.supabase.co"  // Remplace par ton URL
-    const val SUPABASE_ANON_KEY = "sb_publishable_dYcmK1jtq1uyjUnQPXJnQw_MInGkiq-"  // Remplace par ta clé anon
 }

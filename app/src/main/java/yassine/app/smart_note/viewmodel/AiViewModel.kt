@@ -4,11 +4,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import android.util.Log
 import kotlinx.coroutines.launch
 import yassine.app.smart_note.models.AskResponse
 import yassine.app.smart_note.repository.SmartNoteRepository
 import yassine.app.smart_note.utils.Resource
-import android.util.Log
 
 class AiViewModel(private val repository: SmartNoteRepository) : ViewModel() {
 
@@ -16,21 +16,21 @@ class AiViewModel(private val repository: SmartNoteRepository) : ViewModel() {
     val responseState: LiveData<Resource<AskResponse>> = _responseState
 
     fun sendMessage(question: String) {
-        _responseState.value = Resource.Loading()
+        _responseState.value = Resource.Loading
         viewModelScope.launch {
             try {
                 val response = repository.sendAIMessage(question)
-                Log.d("AiViewModel", "Server response: ${response.response}")
+                Log.d("AiViewModel", "Server response answer=${response.answer}, context=${response.context_used}")
 
-                if (!response.response.isNullOrBlank()) {
+                if (!response.answer.isNullOrBlank()) {
                     _responseState.value = Resource.Success(response)
                 } else {
-                    Log.e("AiViewModel", "Empty response field from server")
+                    Log.e("AiViewModel", "Empty answer field from server: $response")
                     _responseState.value = Resource.Error("L'IA a renvoyé une réponse vide.")
                 }
             } catch (e: Exception) {
                 Log.e("AiViewModel", "Communication error", e)
-                _responseState.value = Resource.Error(e.message ?: "Erreur de communication avec l'IA")
+                _responseState.value = Resource.Error(e.message ?: e.toString())
             }
         }
     }

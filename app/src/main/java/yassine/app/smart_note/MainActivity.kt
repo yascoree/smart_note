@@ -18,18 +18,17 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val repository = SmartNoteRepository.getInstance(applicationContext)
 
-        // Show splash screen briefly then navigate
+        supportActionBar?.hide()
+
         Handler(Looper.getMainLooper()).postDelayed({
-            if (repository.isLoggedIn()) {
-                // User is signed in, go to Home
-                startActivity(Intent(this, HomeActivity::class.java))
+            val destination = if (SmartNoteRepository.getInstance(this).isLoggedIn()) {
+                HomeActivity::class.java
             } else {
-                // No user is signed in, go to Login
-                startActivity(Intent(this, LoginActivity::class.java))
+                LoginActivity::class.java
             }
+            startActivity(Intent(this, destination))
             finish()
-        }, 1200)
+        }, 1500)
     }
 }

@@ -11,24 +11,21 @@ import yassine.app.smart_note.utils.Resource
 
 class HomeViewModel(private val repository: SmartNoteRepository) : ViewModel() {
 
-    private val _notesState = MutableLiveData<Resource<List<Note>>>()
+    private val _notesState = MutableLiveData<Resource<List<Note>>>(Resource.Idle)
     val notesState: LiveData<Resource<List<Note>>> = _notesState
 
-    private val _searchResults = MutableLiveData<Resource<List<Note>>>()
+    private val _searchResults = MutableLiveData<Resource<List<Note>>>(Resource.Idle)
     val searchResults: LiveData<Resource<List<Note>>> = _searchResults
 
-    private val _deleteState = MutableLiveData<Resource<Boolean>>(Resource.Idle())
+    private val _deleteState = MutableLiveData<Resource<Boolean>>(Resource.Idle)
     val deleteState: LiveData<Resource<Boolean>> = _deleteState
-
-    private val _favoriteState = MutableLiveData<Resource<Boolean>>(Resource.Idle())
-    val favoriteState: LiveData<Resource<Boolean>> = _favoriteState
 
     init {
         loadNotes()
     }
 
     fun loadNotes() {
-        _notesState.value = Resource.Loading()
+        _notesState.value = Resource.Loading
         viewModelScope.launch {
             try {
                 val notes = repository.getAllNotes()
@@ -44,7 +41,7 @@ class HomeViewModel(private val repository: SmartNoteRepository) : ViewModel() {
             loadNotes()
             return
         }
-        _searchResults.value = Resource.Loading()
+        _searchResults.value = Resource.Loading
         viewModelScope.launch {
             try {
                 val results = repository.searchNotes(query)
@@ -56,12 +53,12 @@ class HomeViewModel(private val repository: SmartNoteRepository) : ViewModel() {
     }
 
     fun deleteNote(noteId: String) {
-        _deleteState.value = Resource.Loading()
+        _deleteState.value = Resource.Loading
         viewModelScope.launch {
             try {
                 val result = repository.deleteNote(noteId)
                 if (result) {
-                    loadNotes() // Recharger la liste
+                    loadNotes()
                     _deleteState.value = Resource.Success(true)
                 } else {
                     _deleteState.value = Resource.Error("Erreur lors de la suppression")
@@ -72,19 +69,13 @@ class HomeViewModel(private val repository: SmartNoteRepository) : ViewModel() {
         }
     }
 
-    fun toggleFavorite(noteId: String, currentStatus: Boolean) {
-        _favoriteState.value = Resource.Loading()
+    fun toggleFavorite(noteId: String, isFavorite: Boolean) {
         viewModelScope.launch {
             try {
-                val result = repository.toggleFavorite(noteId, !currentStatus)
-                if (result) {
-                    loadNotes() // Recharger la liste
-                    _favoriteState.value = Resource.Success(true)
-                } else {
-                    _favoriteState.value = Resource.Error("Erreur lors du changement")
-                }
+                repository.toggleFavorite(noteId, !isFavorite)
+                loadNotes()
             } catch (e: Exception) {
-                _favoriteState.value = Resource.Error(e.message ?: "Erreur")
+                e.printStackTrace()
             }
         }
     }

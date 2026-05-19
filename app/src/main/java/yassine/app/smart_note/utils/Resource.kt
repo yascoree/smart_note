@@ -1,11 +1,8 @@
 package yassine.app.smart_note.utils
 
-sealed class Resource<T>(
-    val data: T? = null,
-    val message: String? = null
-) {
-    class Idle<T> : Resource<T>()
-    class Loading<T> : Resource<T>()
-    class Success<T>(data: T) : Resource<T>(data)
-    class Error<T>(message: String, data: T? = null) : Resource<T>(data, message)
+sealed class Resource<out T> {
+    data object Idle : Resource<Nothing>()
+    data object Loading : Resource<Nothing>()
+    data class Success<T>(val data: T) : Resource<T>()
+    data class Error(val message: String) : Resource<Nothing>()
 }

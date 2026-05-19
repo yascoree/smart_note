@@ -1,18 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
         android:id="@+id/nav_home"
-        android:title="Home"
-        android:icon="@android:drawable/ic_menu_view"/>
-
-    <item
-        android:id="@+id/nav_notes"
-        android:title="Notes"
-        android:icon="@android:drawable/ic_menu_agenda"/>
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
 
     <item
         android:id="@+id/nav_ai"
-        android:title="AI"
-        android:icon="@android:drawable/ic_btn_speak_now"/>
+        android:icon="@drawable/ic_robot"
+        android:title="AI" />
+
+    <item
+        android:id="@+id/nav_profile"
+        android:icon="@drawable/ic_person"
+        android:title="Profile" />
 
 </menu>

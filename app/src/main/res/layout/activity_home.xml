@@ -5,146 +5,168 @@
     android:layout_height="match_parent"
     android:background="@color/background">
 
-    <LinearLayout
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
+        <!-- Top Bar with Greeting -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/surface"
-            android:elevation="0dp"
-            app:menu="@menu/home_menu"
-            app:title="My Notes"
-            app:titleTextColor="@color/on_surface" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="16dp"
+            android:background="@color/background">
 
+            <TextView
+                android:id="@+id/tv_greeting"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Good morning, Yassine"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_primary" />
+
+        </LinearLayout>
+
+        <!-- Search Bar -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
             android:layout_marginEnd="16dp"
-            app:cardBackgroundColor="@color/surface"
-            app:cardCornerRadius="18dp"
+            android:layout_marginBottom="16dp"
+            app:cardBackgroundColor="@color/surface_secondary"
+            app:cardCornerRadius="24dp"
             app:cardElevation="0dp"
-            app:strokeColor="@color/outline"
-            app:strokeWidth="1dp">
+            app:strokeColor="@color/border"
+            app:strokeWidth="0.5dp">
 
-            <EditText
+                <EditText
                 android:id="@+id/et_search"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
+                android:layout_height="48dp"
                 android:background="@android:color/transparent"
                 android:drawableStart="@drawable/ic_search"
+                    android:drawableTint="@color/text_tertiary"
                 android:drawablePadding="12dp"
                 android:hint="Search notes..."
                 android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:textColor="@color/on_surface"
-                android:textColorHint="@color/on_surface_variant"
+                    android:textColor="@color/text_primary"
+                    android:textColorHint="@color/text_tertiary"
                 android:textSize="14sp" />
 
         </com.google.android.material.card.MaterialCardView>
 
-        <LinearLayout
+        <!-- Filter Chips Row -->
+        <HorizontalScrollView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="16dp"
-            android:orientation="horizontal">
+            android:scrollbars="none"
+            android:layout_marginBottom="16dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/surface"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/outline"
-                app:strokeWidth="1dp">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+                <!-- All Chip (Active by default) -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_all"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="All"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="8dp"
+                    app:chipBackgroundColor="@color/accent_purple_bg"
+                    app:chipStrokeColor="@color/accent_purple"
+                    app:chipStrokeWidth="0.5dp"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    android:textColor="@color/text_inverse" />
 
-                    <TextView
-                        android:id="@+id/tv_total_notes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="@color/primary"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
+                <!-- Work Chip -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_work"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Work"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="8dp"
+                    app:chipBackgroundColor="@color/surface"
+                    app:chipStrokeColor="@color/border"
+                    app:chipStrokeWidth="0.5dp"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    android:textColor="@color/text_secondary" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Total Notes"
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="12sp" />
+                <!-- Personal Chip -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_personal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Personal"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="8dp"
+                    app:chipBackgroundColor="@color/surface"
+                    app:chipStrokeColor="@color/border"
+                    app:chipStrokeWidth="0.5dp"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    android:textColor="@color/text_secondary" />
 
-                </LinearLayout>
+                <!-- Ideas Chip -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_ideas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Ideas"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="8dp"
+                    app:chipBackgroundColor="@color/surface"
+                    app:chipStrokeColor="@color/border"
+                    app:chipStrokeWidth="0.5dp"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    android:textColor="@color/text_secondary" />
 
-            </com.google.android.material.card.MaterialCardView>
+                <!-- AI Chip -->
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_ai"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="AI"
+                    android:textSize="12sp"
+                    app:chipBackgroundColor="@color/surface"
+                    app:chipStrokeColor="@color/border"
+                    app:chipStrokeWidth="0.5dp"
+                    app:textEndPadding="12dp"
+                    app:textStartPadding="12dp"
+                    android:textColor="@color/text_secondary" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_weight="1"
-                app:cardBackgroundColor="@color/surface"
-                app:cardCornerRadius="18dp"
-                app:cardElevation="0dp"
-                app:strokeColor="@color/outline"
-                app:strokeWidth="1dp">
+            </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="16dp">
+        </HorizontalScrollView>
 
-                    <TextView
-                        android:id="@+id/tv_favorite_notes"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="0"
-                        android:textColor="@color/warning"
-                        android:textSize="24sp"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="Favorites"
-                        android:textColor="@color/on_surface_variant"
-                        android:textSize="12sp" />
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
-
-        </LinearLayout>
-
+        <!-- Notes RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_notes"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
             android:clipToPadding="false"
-            android:padding="8dp"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            android:paddingBottom="80dp"
             android:scrollbars="vertical" />
 
+        <!-- Empty State -->
         <LinearLayout
             android:id="@+id/layout_empty"
             android:layout_width="match_parent"
@@ -154,17 +176,19 @@
             android:orientation="vertical"
             android:visibility="gone">
 
-            <ImageView
+                <ImageView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:src="@drawable/ic_empty_notes" />
+                android:src="@drawable/ic_empty_notes"
+                app:tint="@color/text_tertiary"
+                android:alpha="0.5" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="No Notes Yet"
-                android:textColor="@color/on_surface"
+                android:text="No notes yet"
+                android:textColor="@color/text_primary"
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
@@ -173,21 +197,35 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:text="Tap the + button to create your first note"
-                android:textColor="@color/on_surface_variant"
+                android:textColor="@color/text_secondary"
                 android:textSize="14sp" />
 
         </LinearLayout>
 
     </LinearLayout>
 
+    <!-- FAB -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_note"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
         android:src="@drawable/ic_add"
-        app:backgroundTint="@color/primary"
-        app:tint="@color/on_primary" />
+        app:backgroundTint="@color/accent_primary"
+        app:tint="@color/text_inverse"
+        app:fabSize="normal" />
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@color/background"
+        app:elevation="0dp"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_nav_menu" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -18,7 +18,7 @@ class AddNoteViewModel(private val repository: SmartNoteRepository) : ViewModel(
     val updateState: LiveData<Resource<Note>> = _updateState
 
     fun saveNote(title: String, content: String, color: String) {
-        _saveState.value = Resource.Loading()
+        _saveState.value = Resource.Loading
         viewModelScope.launch {
             try {
                 val note = repository.addNote(title, content, color)
@@ -30,7 +30,7 @@ class AddNoteViewModel(private val repository: SmartNoteRepository) : ViewModel(
     }
 
     fun updateNote(note: Note) {
-        _updateState.value = Resource.Loading()
+        _updateState.value = Resource.Loading
         viewModelScope.launch {
             try {
                 val updatedNote = repository.updateNote(note)

@@ -1,69 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_splash_gradient">
+    android:background="@color/background"
+    android:fitsSystemWindows="true">
 
-    <ImageView
-        android:id="@+id/logo_image"
-        android:layout_width="92dp"
-        android:layout_height="92dp"
-        android:contentDescription="App Logo"
-        android:src="@drawable/ic_note_logo"
-        app:layout_constraintBottom_toTopOf="@id/title"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_chainStyle="packed" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center">
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
+        <!-- Circular Orb with Gradient -->
+        <FrameLayout
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="@drawable/app_logo" />
+
+        <!-- App Name -->
+        <TextView
+            android:id="@+id/tv_app_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Smart Note"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:layout_marginTop="24dp"
+            android:letterSpacing="-0.03" />
+
+        <!-- Tagline -->
+        <TextView
+            android:id="@+id/tv_tagline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Think smarter. Write faster."
+            android:textSize="13sp"
+            android:textColor="@color/text_tertiary"
+            android:layout_marginTop="8dp" />
+
+    </LinearLayout>
+
+    <!-- Loading Indicator at Bottom -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/app_name"
-        android:textColor="@color/on_primary"
-        android:textSize="32sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@id/subtitle"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/logo_image" />
+        android:layout_gravity="bottom|center_horizontal"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingBottom="60dp">
 
-    <TextView
-        android:id="@+id/subtitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Capture ideas. Organize fast."
-        android:textColor="#DCEBFF"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toTopOf="@id/progress"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@color/accent_purple"
+            android:layout_marginEnd="4dp" />
 
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="20dp"
-        android:indeterminateTint="@color/on_primary"
-        app:layout_constraintBottom_toTopOf="@id/version"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@color/accent_purple"
+            android:layout_marginEnd="4dp" />
 
-    <TextView
-        android:id="@+id/version"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="22dp"
-        android:text="Version 1.0.0"
-        android:textColor="#C5D9FF"
-        android:textSize="12sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        <View
+            android:layout_width="8dp"
+            android:layout_height="8dp"
+            android:background="@color/accent_purple" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</FrameLayout>

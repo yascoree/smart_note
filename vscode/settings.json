@@ -13,5 +13,9 @@
     
     // Éditeur
     "editor.formatOnSave": true,
-    "files.autoSave": "onFocusChange"
+    "files.autoSave": "onFocusChange",
+
+    "terminal.integrated.env.windows": {
+        "JAVA_HOME": "C:\\Program Files\\Java\\jdk-17"
+    }
 }

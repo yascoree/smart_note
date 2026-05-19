@@ -4,174 +4,184 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F5F5F5">
+    android:background="@color/background">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
+    <!-- Top Bar -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="@android:color/white"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:title="Note Details"
-        app:titleTextColor="#1A1A1A" />
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:background="@color/background">
+
+        <ImageButton
+            android:id="@+id/btn_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_back"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Back"
+            android:scaleType="centerInside"
+            app:tint="@color/text_primary" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_share"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            android:layout_marginEnd="4dp"
+            app:cornerRadius="20dp"
+            app:backgroundTint="@color/surface_secondary"
+            app:iconTint="@color/accent_teal"
+            app:icon="@drawable/ic_share"
+            app:iconSize="18dp"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:strokeColor="@color/border"
+            app:strokeWidth="1dp"
+            app:elevation="0dp"
+            android:contentDescription="Share" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_favorite"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:padding="0dp"
+            android:layout_marginEnd="4dp"
+            app:cornerRadius="20dp"
+            app:backgroundTint="@color/surface_secondary"
+            app:iconTint="@color/accent_purple"
+            app:icon="@drawable/ic_favorite_border"
+            app:iconSize="18dp"
+            app:iconGravity="textStart"
+            app:iconPadding="0dp"
+            app:strokeColor="@color/border"
+            app:strokeWidth="1dp"
+            app:elevation="0dp"
+            android:contentDescription="Favorite" />
+
+        <ImageButton
+            android:id="@+id/btn_more"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Edit"
+            android:scaleType="centerInside"
+            app:tint="@color/text_secondary" />
+
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/border" />
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:padding="16dp">
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="24dp"
+        android:clipToPadding="false">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- Title -->
+            <TextView
+                android:id="@+id/tv_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                android:paddingBottom="12dp"
+                android:text="Note Title"
+                android:textColor="@color/text_primary"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:letterSpacing="-0.02" />
+
+            <!-- Metadata row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingBottom="20dp">
+
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_calendar"
+                    app:tint="@color/text_tertiary" />
 
                 <TextView
-                    android:id="@+id/tv_title"
-                    android:layout_width="match_parent"
+                    android:id="@+id/tv_created"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="20dp"
-                    android:text="Note Title"
-                    android:textColor="#1A1A1A"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:text="Jan 1, 2024"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:layout_marginStart="6dp" />
 
-            </com.google.android.material.card.MaterialCardView>
+                <View
+                    android:layout_width="1dp"
+                    android:layout_height="12dp"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@color/border" />
 
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/card_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
+                <ImageView
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_edit"
+                    app:tint="@color/text_tertiary" />
 
                 <TextView
-                    android:id="@+id/tv_content"
-                    android:layout_width="match_parent"
+                    android:id="@+id/tv_updated"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="20dp"
-                    android:text="Note content goes here..."
-                    android:textColor="#666666"
-                    android:textSize="16sp"
-                    android:lineSpacingExtra="4dp" />
+                    android:text="Jan 1, 2024"
+                    android:textColor="@color/text_tertiary"
+                    android:textSize="12sp"
+                    android:layout_marginStart="6dp" />
 
-            </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:layout_marginBottom="20dp"
+                android:background="@color/border" />
+
+            <!-- Content -->
+            <TextView
+                android:id="@+id/tv_content"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="2dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="8dp">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_calendar"
-                            app:tint="#666666" />
-
-                        <TextView
-                            android:id="@+id/tv_created"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:text="Created: Jan 1, 2024"
-                            android:textColor="#666666"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_edit"
-                            app:tint="#666666" />
-
-                        <TextView
-                            android:id="@+id/tv_updated"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="12dp"
-                            android:text="Updated: Jan 1, 2024"
-                            android:textColor="#666666"
-                            android:textSize="12sp" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </com.google.android.material.card.MaterialCardView>
+                android:text="Note content goes here..."
+                android:textColor="@color/text_secondary"
+                android:textSize="15sp"
+                android:lineSpacingMultiplier="1.6" />
 
         </LinearLayout>
 
     </ScrollView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="end"
-        android:padding="16dp"
-        android:orientation="horizontal">
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_share"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_share"
-            app:backgroundTint="#4CAF50"
-            app:tint="@android:color/white" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_favorite"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:src="@android:drawable/btn_star_big_off"
-            app:backgroundTint="#FFC107"
-            app:tint="@android:color/white" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_edit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_edit"
-            app:backgroundTint="#2196F3"
-            app:tint="@android:color/white" />
-
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_delete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_delete"
-            app:backgroundTint="#F44336"
-            app:tint="@android:color/white" />
-
-    </LinearLayout>
 
 </LinearLayout>

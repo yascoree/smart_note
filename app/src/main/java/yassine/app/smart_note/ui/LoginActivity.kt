@@ -2,7 +2,9 @@ package yassine.app.smart_note.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -21,6 +23,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private lateinit var authService: FirebaseAuthService
     private lateinit var authRepository: FirebaseAuthRepository
+    
     private val viewModel: AuthViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
             override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
@@ -31,26 +34,23 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private val googleLauncher = registerForActivityResult(
-        androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult()
+        ActivityResultContracts.StartActivityForResult()
     ) { result ->
-        if (result.resultCode == RESULT_OK) {
-            val data = result.data
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = task.getResult(ApiException::class.java)
-                account?.idToken?.let { idToken ->
-                    lifecycleScope.launch {
-                        val signInResult = viewModel.signInWithGoogle(idToken)
-                        if (signInResult.isSuccess) {
-                            navigateToHome()
-                        } else {
-                            Toast.makeText(this, "Erreur Google: ${signInResult.exceptionOrNull()?.message}", Toast.LENGTH_SHORT).show()
-                        }
+        val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+        try {
+            val account = task.getResult(ApiException::class.java)
+            account?.idToken?.let { idToken ->
+                lifecycleScope.launch {
+                    val signInResult = viewModel.signInWithGoogle(idToken)
+                    if (signInResult.isSuccess) {
+                        navigateToHome()
+                    } else {
+                        Toast.makeText(this@LoginActivity, "Erreur Google: ${signInResult.exceptionOrNull()?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }
-            } catch (e: ApiException) {
-                Toast.makeText(this, "Erreur Google: ${e.message}", Toast.LENGTH_SHORT).show()
             }
+        } catch (e: ApiException) {
+            Toast.makeText(this, "Erreur Google: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -69,12 +69,8 @@ class LoginActivity : AppCompatActivity() {
     private fun setupObservers() {
         viewModel.authState.observe(this) { state ->
             when (state) {
-                is AuthUiState.Authenticated -> {
-                    navigateToHome()
-                }
-                is AuthUiState.Error -> {
-                    Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
-                }
+                is AuthUiState.Authenticated -> navigateToHome()
+                is AuthUiState.Error -> Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
                 else -> {}
             }
         }
@@ -82,22 +78,23 @@ class LoginActivity : AppCompatActivity() {
         viewModel.loginState.observe(this) { resource ->
             when (resource) {
                 is Resource.Loading -> {
-                    binding.progressBar.visibility = android.view.View.VISIBLE
+                    binding.progressBar.visibility = View.VISIBLE
                     binding.btnLogin.isEnabled = false
                 }
                 is Resource.Success -> {
-                    binding.progressBar.visibility = android.view.View.GONE
+                    binding.progressBar.visibility = View.GONE
                     binding.btnLogin.isEnabled = true
-                    if (resource.data != null) {
-                        Toast.makeText(this, "Connexion réussie!", Toast.LENGTH_SHORT).show()
-                    }
+                    Toast.makeText(this, "Connexion réussie!", Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Error -> {
-                    binding.progressBar.visibility = android.view.View.GONE
+                    binding.progressBar.visibility = View.GONE
                     binding.btnLogin.isEnabled = true
                     Toast.makeText(this, resource.message, Toast.LENGTH_LONG).show()
                 }
-                else -> {}
+                is Resource.Idle -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.btnLogin.isEnabled = true
+                }
             }
         }
     }
