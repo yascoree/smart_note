@@ -22,11 +22,11 @@
             android:background="@drawable/gradient_purple_blue">
 
             <ImageView
-                android:layout_width="18dp"
-                android:layout_height="18dp"
+                android:layout_width="33dp"
+                android:layout_height="33dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_ai_avatar"
-                android:tint="@color/text_primary" />
+                android:src="@drawable/avatar_normal"
+                 />
 
         </FrameLayout>
 

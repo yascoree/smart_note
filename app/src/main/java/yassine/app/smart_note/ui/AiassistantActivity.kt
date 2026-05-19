@@ -134,7 +134,7 @@ class AiAssistantActivity : AppCompatActivity() {
     private fun addWelcomeMessage() {
         val welcomeMessage = ChatMessage(Constants.WELCOME_MESSAGE, isUser = false)
         messages.add(welcomeMessage)
-        chatAdapter.updateMessages(messages)
+        chatAdapter.addMessage(welcomeMessage)
     }
 
     private fun syncNotesWithBackend() {
@@ -152,10 +152,13 @@ class AiAssistantActivity : AppCompatActivity() {
     }
 
     private fun sendMessage(question: String) {
-        // Ajouter la question de l'utilisateur
         val userMessage = ChatMessage(question, isUser = true)
         messages.add(userMessage)
-        chatAdapter.updateMessages(messages)
+        chatAdapter.addMessage(userMessage)
+
+        val typingMessage = ChatMessage(text = "", isUser = false, isTyping = true)
+        messages.add(typingMessage)
+        chatAdapter.addMessage(typingMessage)
         binding.etMessage.text.clear()
         binding.rvChat.scrollToPosition(messages.size - 1)
 
@@ -163,22 +166,48 @@ class AiAssistantActivity : AppCompatActivity() {
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
+                val latestNotes = repository.getAllNotes()
+                val syncedNow = repository.syncNotesToBackend(latestNotes)
+                android.util.Log.d(
+                    "AiAssistantActivity",
+                    "Before /ask synced $syncedNow note(s), total Firebase notes=${latestNotes.size}"
+                )
+
                 val response = repository.sendAIMessage(question)
                 val answer = response.answer ?: "Désolé, je n'ai pas compris."
+                val contextUsed = response.context_used.orEmpty()
+                val answerWithContext = if (contextUsed.isEmpty()) {
+                    answer
+                } else {
+                    "$answer\n\n---\nContext used (${contextUsed.size}):\n${contextUsed.joinToString("\n- ", prefix = "- ")}"
+                }
+
+                android.util.Log.d(
+                    "AiAssistantActivity",
+                    "AI response received. context_used_count=${contextUsed.size}"
+                )
+
                 withContext(Dispatchers.Main) {
                     binding.btnSend.isEnabled = true
-                    val aiMessage = ChatMessage(answer, isUser = false)
+                    messages.removeAll { it.isTyping }
+                    chatAdapter.removeTypingMessage()
+                    val aiMessage = ChatMessage(answerWithContext, isUser = false)
                     messages.add(aiMessage)
-                    chatAdapter.updateMessages(messages)
+                    chatAdapter.addMessage(aiMessage)
+                    chatAdapter.notifyDataSetChanged()
                     binding.rvChat.scrollToPosition(messages.size - 1)
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     binding.btnSend.isEnabled = true
+                    messages.removeAll { it.isTyping }
+                    chatAdapter.removeTypingMessage()
                     Toast.makeText(this@AiAssistantActivity, e.message ?: "Erreur IA", Toast.LENGTH_LONG).show()
                     val errorMessage = ChatMessage("⚠️ Erreur: ${e.message ?: "Erreur IA"}", isUser = false)
                     messages.add(errorMessage)
-                    chatAdapter.updateMessages(messages)
+                    chatAdapter.addMessage(errorMessage)
+                    chatAdapter.notifyDataSetChanged()
+                    binding.rvChat.scrollToPosition(messages.size - 1)
                 }
             }
         }

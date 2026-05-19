@@ -5,34 +5,20 @@
     android:layout_height="wrap_content"
     android:paddingVertical="8dp">
 
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/iv_avatar"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:background="@drawable/gradient_purple_blue"
-        android:padding="6dp"
-        android:scaleType="centerCrop"
-        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.ChatAvatar"
-        app:srcCompat="@drawable/ic_ai_avatar"
-        app:tint="@color/text_primary"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Message Card -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cv_message_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="48dp"
-        app:cardBackgroundColor="@color/surface_secondary"
+        android:layout_marginStart="48dp"
+        app:cardBackgroundColor="@color/accent_primary"
         app:cardCornerRadius="12dp"
         app:cardElevation="0dp"
         app:strokeColor="@color/border"
         app:strokeWidth="0.5dp"
         app:layout_constrainedWidth="true"
+        app:layout_constraintHorizontal_bias="1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/iv_avatar"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintWidth_max="280dp">
 
@@ -44,23 +30,20 @@
             android:paddingEnd="14dp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
-            android:textColor="@color/text_primary"
+            android:textColor="@color/text_inverse"
             android:textSize="14sp"
-            android:lineSpacingExtra="2dp"
-            android:textIsSelectable="true" />
+            android:lineSpacingExtra="2dp" />
 
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- Time -->
     <TextView
         android:id="@+id/tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginStart="12dp"
         android:textColor="@color/text_tertiary"
         android:textSize="10sp"
-        app:layout_constraintStart_toEndOf="@id/iv_avatar"
+        app:layout_constraintEnd_toEndOf="@id/cv_message_container"
         app:layout_constraintTop_toBottomOf="@id/cv_message_container" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
