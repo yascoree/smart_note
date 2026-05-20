@@ -13,3 +13,16 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Backend secrets
+/ai-memory-backend/*.json
+/ai-memory-backend/*firebase-adminsdk*.json
+/ai-memory-backend/*.key
+/ai-memory-backend/*.pem
+/ai-memory-backend/.env
+/ai-memory-backend/venv/
+/ai-memory-backend/__pycache__/
+
+# Firebase and Google services
+/google-services.json
+/app/google-services.json
