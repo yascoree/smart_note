@@ -9,6 +9,8 @@ object Constants {
     // Emulator loopback address for Android emulator
     private const val EMULATOR_BASE_URL = "http://10.0.2.2:8000/"
 
+    const val KEY_BACKEND_BASE_URL = "backend_base_url"
+
     /**
      * Returns the appropriate base URL depending on whether the app runs on an emulator.
      * - Emulator: `10.0.2.2`
@@ -18,14 +20,33 @@ object Constants {
         return if (isRunningOnEmulator()) EMULATOR_BASE_URL else LAN_BASE_URL
     }
 
+    fun normalizeBaseUrl(url: String): String {
+        val trimmed = url.trim()
+        return if (trimmed.endsWith("/")) trimmed else "$trimmed/"
+    }
+
     fun isRunningOnEmulator(): Boolean {
-        return (Build.FINGERPRINT.startsWith("generic")
-                || Build.FINGERPRINT.lowercase().contains("vbox")
-                || Build.MODEL.contains("Emulator")
-                || Build.MODEL.contains("Android SDK built for x86")
-                || Build.MANUFACTURER.contains("Genymotion")
-                || Build.BRAND.startsWith("generic")
-                || Build.DEVICE.startsWith("generic"))
+        val fingerprint = Build.FINGERPRINT.lowercase()
+        val model = Build.MODEL.lowercase()
+        val manufacturer = Build.MANUFACTURER.lowercase()
+        val brand = Build.BRAND.lowercase()
+        val device = Build.DEVICE.lowercase()
+        val product = Build.PRODUCT.lowercase()
+        val hardware = Build.HARDWARE.lowercase()
+
+        return fingerprint.startsWith("generic")
+            || fingerprint.contains("vbox")
+            || fingerprint.contains("test-keys")
+            || model.contains("emulator")
+            || model.contains("android sdk built for x86")
+            || manufacturer.contains("genymotion")
+            || brand.startsWith("generic")
+            || device.startsWith("generic")
+            || product.contains("sdk_gphone")
+            || product.contains("emulator")
+            || product.contains("sdk")
+            || hardware.contains("ranchu")
+            || hardware.contains("goldfish")
     }
 
     const val CONNECTION_TIMEOUT = 30L

@@ -1,5 +1,6 @@
 package yassine.app.smart_note.api
 
+import android.content.Context
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -9,7 +10,7 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitInstance {
 
-    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+    private val loggingInterceptor = HttpLoggingInterceptor().apply { // Logs FastAPI requests
         level = HttpLoggingInterceptor.Level.BODY
     }
 
@@ -20,11 +21,21 @@ object RetrofitInstance {
         .writeTimeout(Constants.WRITE_TIMEOUT, TimeUnit.SECONDS)
         .build()
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl(Constants.getBaseUrl())
-        .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    fun createApi(context: Context): SmartNotesApi {
+        val sharedPreferences = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE)
+        val configuredUrl = sharedPreferences.getString(Constants.KEY_BACKEND_BASE_URL, null)
+        val baseUrl = if (configuredUrl.isNullOrBlank()) {
+            Constants.getBaseUrl()
+        } else {
+            Constants.normalizeBaseUrl(configuredUrl)
+        }
 
-    val api: SmartNotesApi = retrofit.create(SmartNotesApi::class.java)
+        val retrofit = Retrofit.Builder()
+            .baseUrl(baseUrl)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        return retrofit.create(SmartNotesApi::class.java)
+    }
 }

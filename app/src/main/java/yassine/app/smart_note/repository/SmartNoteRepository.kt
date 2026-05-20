@@ -20,6 +20,8 @@ class SmartNoteRepository private constructor(private val context: Context) {
     private val syncedBackendNotesKey = "synced_backend_notes"
     private val syncedBackendUserKey = "synced_backend_user"
 
+    private fun api() = RetrofitInstance.createApi(context)
+
     companion object {
         @Volatile
         private var INSTANCE: SmartNoteRepository? = null
@@ -139,7 +141,7 @@ class SmartNoteRepository private constructor(private val context: Context) {
                     "SmartNoteRepository",
                     "Pushing note to backend: id=${note.id}, updatedAt=${note.updatedAt}, key=$syncKey, preview=${textToIndex.take(120)}"
                 )
-                val pushResponse = RetrofitInstance.api.pushNote(BackendNoteRequest(text = textToIndex))
+                val pushResponse = api().pushNote(BackendNoteRequest(text = textToIndex))
                 android.util.Log.d(
                     "SmartNoteRepository",
                     "Push response for id=${note.id}: code=${pushResponse.code()}, successful=${pushResponse.isSuccessful}"
@@ -160,7 +162,7 @@ class SmartNoteRepository private constructor(private val context: Context) {
             val request = AskRequest(question = question)
             android.util.Log.d("SmartNoteRepository", "Sending AI request to /ask")
             android.util.Log.d("SmartNoteRepository", "AI question payload: $question")
-            RetrofitInstance.api.sendMessage(request)
+            api().sendMessage(request)
         } catch (e: Exception) {
             e.printStackTrace()
             android.util.Log.e("SmartNoteRepository", "AI request failed", e)

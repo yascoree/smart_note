@@ -30,6 +30,16 @@ data class Note(
     )
 }
 
+
+
+
+
+
+
+
+
+
+
 data class NoteEntity(
     val id: String,
     val title: String,

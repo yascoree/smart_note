@@ -3,12 +3,17 @@ package yassine.app.smart_note.ui
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.InputType
+import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import yassine.app.smart_note.utils.Constants
 import yassine.app.smart_note.databinding.ActivityProfileBinding
 import yassine.app.smart_note.repository.SmartNoteRepository
 import java.text.SimpleDateFormat
@@ -20,6 +25,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding
     private lateinit var repository: SmartNoteRepository
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var backendPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,12 +34,14 @@ class ProfileActivity : AppCompatActivity() {
 
         repository = SmartNoteRepository.getInstance(applicationContext)
         sharedPreferences = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        backendPreferences = getSharedPreferences(Constants.PREF_NAME, MODE_PRIVATE)
 
         setupUserInfo()
         loadNotesCount()
         setupBackButton()
         setupLogoutButton()
         setupNotificationsToggle()
+        setupBackendUrlSetting()
     }
 
     override fun onStart() {
@@ -95,6 +103,54 @@ class ProfileActivity : AppCompatActivity() {
         binding.switchNotifications.setOnCheckedChangeListener { _, isChecked ->
             sharedPreferences.edit().putBoolean("notifications_enabled", isChecked).apply()
         }
+    }
+
+    private fun setupBackendUrlSetting() {
+        refreshBackendUrlLabel()
+        binding.rowBackendUrl.setOnClickListener {
+            showBackendUrlDialog()
+        }
+    }
+
+    private fun refreshBackendUrlLabel() {
+        val configuredUrl = backendPreferences.getString(Constants.KEY_BACKEND_BASE_URL, null).orEmpty().trim()
+        binding.tvBackendUrl.text = if (configuredUrl.isBlank()) {
+            "Default: ${Constants.getBaseUrl()}"
+        } else {
+            Constants.normalizeBaseUrl(configuredUrl)
+        }
+    }
+
+    private fun showBackendUrlDialog() {
+        val input = EditText(this).apply {
+            setText(backendPreferences.getString(Constants.KEY_BACKEND_BASE_URL, null).orEmpty())
+            hint = "http://192.168.x.x:8000/"
+            inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_URI
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("AI backend URL")
+            .setMessage("Leave empty to use the default URL for this device.")
+            .setView(input)
+            .setNegativeButton("Cancel", null)
+            .setNeutralButton("Reset") { _, _ ->
+                backendPreferences.edit().remove(Constants.KEY_BACKEND_BASE_URL).apply()
+                refreshBackendUrlLabel()
+                Toast.makeText(this, "Backend URL reset", Toast.LENGTH_SHORT).show()
+            }
+            .setPositiveButton("Save") { _, _ ->
+                val value = input.text.toString().trim()
+                if (value.isBlank()) {
+                    backendPreferences.edit().remove(Constants.KEY_BACKEND_BASE_URL).apply()
+                } else {
+                    backendPreferences.edit()
+                        .putString(Constants.KEY_BACKEND_BASE_URL, Constants.normalizeBaseUrl(value))
+                        .apply()
+                }
+                refreshBackendUrlLabel()
+                Toast.makeText(this, "Backend URL updated", Toast.LENGTH_SHORT).show()
+            }
+            .show()
     }
 
     private fun setupLogoutButton() {
