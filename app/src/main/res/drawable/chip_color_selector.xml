@@ -1,6 +1,4 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:state_checked="true" android:color="@color/accent_purple_bg"/>
-    <item android:color="@color/surface"/>
-
+    <item android:state_checked="true" android:color="@color/bg_tint_purple"/>
+    <item android:color="@color/bg_elevated"/>
 </selector>

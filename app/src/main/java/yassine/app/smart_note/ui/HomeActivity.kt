@@ -140,11 +140,13 @@ class HomeActivity : AppCompatActivity() {
                 R.id.nav_home -> true
                 R.id.nav_ai -> {
                     startActivity(Intent(this, AiAssistantActivity::class.java))
-                    true
+                    binding.bottomNavigation.selectedItemId = R.id.nav_home
+                    false
                 }
                 R.id.nav_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
-                    true
+                    binding.bottomNavigation.selectedItemId = R.id.nav_home
+                    false
                 }
                 else -> false
             }

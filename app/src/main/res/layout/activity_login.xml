@@ -18,7 +18,7 @@
         <FrameLayout
             android:layout_width="120dp"
             android:layout_height="120dp"
-            android:background="@drawable/app_logo" />
+            android:background="@drawable/logo_smart_note" />
 
         <!-- Header -->
         <TextView

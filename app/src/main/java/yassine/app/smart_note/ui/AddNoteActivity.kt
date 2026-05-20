@@ -7,6 +7,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
+import android.util.Log
+import android.view.MotionEvent
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -36,7 +38,19 @@ class AddNoteActivity : AppCompatActivity() {
     private var editingNoteId: String? = null
 
     private lateinit var speechRecognizer: SpeechRecognizer
+    private lateinit var speechRecognizerIntent: Intent
     private var isListening = false
+
+    private val speechIntentLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val matches = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                val spoken = matches?.firstOrNull() ?: return@registerForActivityResult
+                val current = binding.etContent.text.toString()
+                binding.etContent.setText(if (current.isBlank()) spoken else "$current $spoken")
+                binding.etContent.setSelection(binding.etContent.text.length)
+            }
+        }
 
     private val viewModel: AddNoteViewModel by viewModels {
         object : androidx.lifecycle.ViewModelProvider.Factory {
@@ -141,11 +155,28 @@ class AddNoteActivity : AppCompatActivity() {
             showImagePickerDialog()
         }
 
-        binding.btnMic.setOnClickListener {
-            if (isListening) {
-                stopSpeechRecognition()
-            } else {
-                startVoiceInput()
+        binding.btnMic.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.RECORD_AUDIO
+                        ) == PackageManager.PERMISSION_GRANTED
+                    ) {
+                        startSpeechRecognition()
+                    } else {
+                        requestPermissions(
+                            arrayOf(Manifest.permission.RECORD_AUDIO),
+                            RECORD_AUDIO_PERMISSION_REQUEST
+                        )
+                    }
+                    true
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    stopSpeechRecognition()
+                    true
+                }
+                else -> false
             }
         }
         binding.btnNoteType.setOnClickListener {
@@ -316,6 +347,14 @@ class AddNoteActivity : AppCompatActivity() {
     }
 
     private fun setupSpeechRecognizer() {
+        // Prepare the speech intent
+        speechRecognizerIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak something...")
+        }
+
         speechRecognizer.setRecognitionListener(object : android.speech.RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {}
             override fun onBeginningOfSpeech() {}
@@ -368,19 +407,35 @@ class AddNoteActivity : AppCompatActivity() {
         startSpeechRecognition()
     }
 
+    private fun launchExternalSpeechUi() {
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak now")
+        }
+        try {
+            speechIntentLauncher.launch(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "No speech input available", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun startSpeechRecognition() {
         if (isListening) return
 
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            launchExternalSpeechUi()
+            return
+        }
+
         isListening = true
-        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-        intent.putExtra(
-            RecognizerIntent.EXTRA_LANGUAGE_MODEL,
-            RecognizerIntent.LANGUAGE_MODEL_FREE_FORM
-        )
-        intent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true)
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Speak something...")
-        speechRecognizer.startListening(intent)
+        try {
+            speechRecognizer.startListening(speechRecognizerIntent)
+        } catch (e: Exception) {
+            Log.e("SpeechRecognition", "startListening failed", e)
+            isListening = false
+            launchExternalSpeechUi()
+        }
     }
 
     private fun stopSpeechRecognition() {

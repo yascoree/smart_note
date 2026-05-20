@@ -13,9 +13,9 @@
 
         <!-- Circular Orb with Gradient -->
         <FrameLayout
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:background="@drawable/app_logo" />
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:background="@drawable/logo_smart_note" />
 
         <!-- App Name -->
         <TextView

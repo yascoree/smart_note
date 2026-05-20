@@ -92,7 +92,7 @@
                     app:chipStrokeColor="@drawable/chip_stroke_selector"
                     app:chipStrokeWidth="1dp"
 
-                    android:textColor="@drawable/chip_text_selector"
+                    android:textColor="@color/white"
 
                     app:textStartPadding="12dp"
                     app:textEndPadding="12dp"/>
@@ -113,7 +113,7 @@
                     app:chipStrokeColor="@drawable/chip_stroke_selector"
                     app:chipStrokeWidth="1dp"
 
-                    android:textColor="@drawable/chip_text_selector"
+                    android:textColor="@color/white"
 
                     app:textStartPadding="12dp"
                     app:textEndPadding="12dp"/>
@@ -134,7 +134,7 @@
                     app:chipStrokeColor="@drawable/chip_stroke_selector"
                     app:chipStrokeWidth="1dp"
 
-                    android:textColor="@drawable/chip_text_selector"
+                    android:textColor="@color/white"
 
                     app:textStartPadding="12dp"
                     app:textEndPadding="12dp"/>
@@ -155,7 +155,7 @@
                     app:chipStrokeColor="@drawable/chip_stroke_selector"
                     app:chipStrokeWidth="1dp"
 
-                    android:textColor="@drawable/chip_text_selector"
+                    android:textColor="@color/white"
 
                     app:textStartPadding="12dp"
                     app:textEndPadding="12dp"/>
@@ -176,7 +176,7 @@
                     app:chipStrokeColor="@drawable/chip_stroke_selector"
                     app:chipStrokeWidth="1dp"
 
-                    android:textColor="@drawable/chip_text_selector"
+                    android:textColor="@color/white"
 
                     app:textStartPadding="12dp"
                     app:textEndPadding="12dp"/>
